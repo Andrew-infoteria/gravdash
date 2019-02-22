@@ -1,0 +1,26 @@
+#set("content") {
+	<h1>All Records</h1>
+	#if(count(records) > 0) {
+	<table class="table table-bordered table-hover">
+		<thead class="thead-light">
+			<tr>
+				<th>UUID</th>
+				<th>Value</th>
+				<th>Record Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			#for(record in records) {
+			<tr>
+				<td>#(record.id)</td>
+				<td>#(record.value)</td>
+				<td>#(record.recordTime)</td>
+			</tr>
+			}
+		</tbody>
+	</table>
+	} else {
+		<h2>There aren't any records yet!</h2>
+	}
+}
+#embed("base")
