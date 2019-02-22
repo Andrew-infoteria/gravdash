@@ -1,4 +1,4 @@
-function loadTemperatureGraph (records) {
+function loadTemperatureGraph (datasets) {
 	var ctx = document.getElementById("temperature-chart");
 	var data = [{x: 10, y: 20}, {x: 15, y: 10}];
 	var options = {
@@ -8,16 +8,22 @@ function loadTemperatureGraph (records) {
             }]
         }
     };
+    var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey]
+    var chartDatasets = []
+    for (var key in datasets) {
+    	var chartDataset = {
+            label: key,
+			borderColor: lineColors.shift(),
+            data: datasets[key],
+	        lineTension: 0,
+            fill: false
+        }
+        chartDatasets.push(chartDataset)
+    }
 	var myLineChart = new Chart(ctx, {
 		type: 'line',
 		data: {
-	        datasets: [{
-	            label: 'Singapore',
-				borderColor: 'rgb(255, 99, 132)',
-	            data: records,
-		        lineTension: 0,
-	            fill: false
-	        }]
+	        datasets: chartDatasets
 	    },
 		options: {
 			title: {
@@ -26,7 +32,7 @@ function loadTemperatureGraph (records) {
 				text: 'Temperature'
 			},
 			legend: {
-				display: false
+				position: 'bottom'
 			},
 			tooltips: {
 				mode: 'index',

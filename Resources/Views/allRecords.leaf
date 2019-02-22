@@ -7,6 +7,7 @@
 				<th>UUID</th>
 				<th>Value</th>
 				<th>Record Time</th>
+				<th>Sender Id</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -15,6 +16,7 @@
 				<td>#(record.id)</td>
 				<td>#(record.value)</td>
 				<td>#(record.recordTime)</td>
+				<td>#(record.senderId)</td>
 			</tr>
 			}
 		</tbody>

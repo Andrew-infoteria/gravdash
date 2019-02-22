@@ -6,10 +6,12 @@ final class Record: Codable {
     var id: UUID?
     var value: String
     var recordTime: String
+    var senderId: String
 
-    init(value: String, recordTime: String) {
+    init(value: String, recordTime: String, senderId: String) {
         self.value = value
         self.recordTime = recordTime
+        self.senderId = senderId
     }
 }
 

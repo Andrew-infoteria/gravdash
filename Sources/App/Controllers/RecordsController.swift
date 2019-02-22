@@ -10,7 +10,9 @@ struct RecordsController: RouteCollection {
     }
 
     func createHandler(_ req: Request, record: Record) -> Future<Record> {
-        return record.save(on: req)
+        return record.create(on: req).catchFlatMap { error in
+            return record.save(on: req)
+        }
     }
 
     func getAllHandler(_ req: Request) throws -> Future<[Record]> {

@@ -1,13 +1,19 @@
 #set("script") {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+<script src="/scripts/utils.js"></script>
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
 window.onload = function () {
-	var records = [];
+	var datasets = []
 	#for(record in records) {
-		records.push({x: new Date("#(record.recordTime)"), y: #(record.value)\});
+		var senderId = "#(record.senderId)";
+		if (!datasets.hasOwnProperty(senderId)) {
+			datasets[senderId] = [];
+		\}
+		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
+		datasets[senderId].push(data);
 	}
-	loadTemperatureGraph(records);
+	loadTemperatureGraph(datasets);
 \}
 </script>
 }

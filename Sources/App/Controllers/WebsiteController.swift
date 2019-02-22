@@ -1,4 +1,5 @@
 import Vapor
+import Fluent
 import Leaf
 
 struct WebsiteController: RouteCollection {
@@ -8,14 +9,20 @@ struct WebsiteController: RouteCollection {
     }
 
     func dashboardHandler(_ req: Request) throws -> Future<View> {
-        return Record.query(on: req).all().flatMap(to: View.self) { records in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
+        return Record.query(on: req).filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all().flatMap(to: View.self) { records in
             let context = DashboardContext(title: "Dashboard", records: records)
             return try req.view().render("index", context)
         }
     }
 
     func allRecordsHandler(_ req: Request) throws -> Future<View> {
-        return Record.query(on: req).all().flatMap(to: View.self) { records in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
+        return Record.query(on: req).filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all().flatMap(to: View.self) { records in
             let context = AllRecordsContext(title: "All Records", records: records)
             return try req.view().render("allRecords", context)
         }
