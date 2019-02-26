@@ -8,8 +8,8 @@ function loadTemperatureGraph (datasets) {
             }]
         }
     };
-    var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey]
-    var chartDatasets = []
+    var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+    var chartDatasets = [];
     for (var key in datasets) {
     	var chartDataset = {
             label: key,

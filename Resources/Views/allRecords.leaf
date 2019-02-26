@@ -15,7 +15,7 @@
 			<tr>
 				<td>#(record.id)</td>
 				<td>#(record.value)</td>
-				<td>#(record.recordTime)</td>
+				<td>#datetimeStr(record.recordTime)</td>
 				<td>#(record.senderId)</td>
 			</tr>
 			}
