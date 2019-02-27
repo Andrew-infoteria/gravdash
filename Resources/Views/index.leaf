@@ -4,21 +4,49 @@
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
 window.onload = function () {
-	var datasets = []
-	#for(record in records) {
+	var tDatasets = []
+	#for(record in temperatures) {
 		var senderId = "#(record.senderId)";
-		if (!datasets.hasOwnProperty(senderId)) {
-			datasets[senderId] = [];
-		\}
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		datasets[senderId].push(data);
+		addDataToDataset(data, tDatasets, senderId);
 	}
-	loadTemperatureGraph(datasets);
+	loadTemperatureChart(tDatasets);
+	var buttonPresses = []
+	#for(record in buttonPresses) {
+		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
+	}
+	var datas = [];
+	for (var i = 0; i < buttonPresses.length; i++) {
+		var record = buttonPresses[i];
+		addDataToDataset(record, datas, record.recordTime.substring(0,10));
+	\}
+	var bpDatasets = [];
+	bpDatasets['Single Press'] = [];
+	bpDatasets['Double Press'] = [];
+	bpDatasets['Long Press'] = [];
+	for (var key in datas) {
+		bpDatasets['Single Press'].push({x: key, y: datas[key].filter(record => record.value == 1).length\});
+		bpDatasets['Double Press'].push({x: key, y: datas[key].filter(record => record.value == 2).length\});
+		bpDatasets['Long Press'].push({x: key, y: datas[key].filter(record => record.value == 255).length\});
+	\}
+	var firstDate = new Date(buttonPresses.reduce((min, r) => r.recordTime < min ? r.recordTime : min, buttonPresses[0].recordTime));
+	var lastDate = new Date(buttonPresses.reduce((max, r) => r.recordTime > max ? r.recordTime : max, buttonPresses[0].recordTime));
+	firstDate.setDate(firstDate.getDate() - 1);
+	lastDate.setDate(lastDate.getDate() + 1);
+	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+	loadButtonPressChart(bpDatasets, addBound);
+\}
+function addDataToDataset(data, datasets, name) {
+	if (!datasets.hasOwnProperty(name)) {
+		datasets[name] = [];
+	\}
+	datasets[name].push(data);
 \}
 </script>
 }
 #set("content") {
 	<h1>Dashboard</h1>
 	<canvas id="temperature-chart" width="400" height="250"></canvas>
+	<canvas id="button-press-chart" width="400" height="250"></canvas>
 }
 #embed("base")

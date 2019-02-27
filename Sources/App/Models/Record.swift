@@ -7,14 +7,15 @@ final class Record: Codable {
     var areaName: String
     var layerName: String
     var value: String
+    var type: String
     var recordTime: String
     var senderId: String
 
-
-    init(value: String, areaName: String, layerName: String, recordTime: String, senderId: String) {
+    init(value: String, areaName: String, layerName: String, type: String, recordTime: String, senderId: String) {
         self.areaName = areaName
         self.layerName = layerName
         self.value = value
+        self.type = type
         self.recordTime = recordTime
         self.senderId = senderId
     }
