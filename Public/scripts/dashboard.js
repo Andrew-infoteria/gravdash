@@ -1,13 +1,5 @@
-function loadTemperatureGraph (datasets) {
+function loadTemperatureChart (datasets) {
 	var ctx = document.getElementById("temperature-chart");
-	var data = [{x: 10, y: 20}, {x: 15, y: 10}];
-	var options = {
-        scales: {
-            yAxes: [{
-                stacked: true
-            }]
-        }
-    };
     var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
     var chartDatasets = [];
     for (var key in datasets) {
@@ -65,6 +57,57 @@ function loadTemperatureGraph (datasets) {
 					scaleLabel: {
 						display: true,
 						labelString: 'Degrees Celcius',
+						fontSize: 20
+					}
+				}]
+	        }
+		}
+	});
+}
+
+function loadButtonPressChart (datasets, bound) {
+	var ctx = document.getElementById("button-press-chart");
+    var barColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+    var chartDatasets = []
+    for (var key in datasets) {
+    	var chartDataset = {
+            label: key,
+			backgroundColor: barColors.shift(),
+			fill: false,
+            data: datasets[key]
+        }
+        chartDatasets.push(chartDataset)
+    }
+	var myBarChart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: bound,
+			datasets: chartDatasets
+		},
+		options: {
+			title: {
+				display: true,
+				fontSize: 20,
+				text: 'Button Press'
+			},
+			legend: {
+				position: 'bottom'
+			},
+	        scales: {
+	            xAxes: [{
+	                type: 'time',
+	                display: true,
+	                time: {
+	                	unit: 'day'
+	                }
+	            }],
+				yAxes: [{
+					ticks: {
+						min: 0
+					},
+					scaleLabel: {
+						display: true,
+						labelString: 'Number of times',
 						fontSize: 20
 					}
 				}]
