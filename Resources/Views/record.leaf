@@ -1,0 +1,25 @@
+#set("content") {
+	<h2></h2>
+	<div class="card">
+		<div class="card-header">
+			<h5 class="font-weight-bold mb-3">#(record.id)</h5>
+		</div>
+		<div class="card-body">
+			<dl class="row">
+			  <dt class="col-md-2">Area Name</dt>
+			  <dd class="col-md-10">#(record.areaName)</dd>
+			  <dt class="col-md-2">Layer Name</dt>
+			  <dd class="col-md-10">#(record.layerName)</dd>
+			  <dt class="col-md-2">Type</dt>
+			  <dd class="col-md-10">#(record.type)</dd>
+			  <dt class="col-md-2">Value</dt>
+			  <dd class="col-md-10">#(record.value)</dd>
+			  <dt class="col-md-2">Record Time</dt>
+			  <dd class="col-md-10">#(record.recordTime)</dd>
+			  <dt class="col-md-2">Sender Id</dt>
+			  <dd class="col-md-10">#(record.senderId)</dd>
+			</dl>
+		</div>
+	</div>
+}
+#embed("base")

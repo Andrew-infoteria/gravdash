@@ -5,6 +5,7 @@ import Leaf
 struct WebsiteController: RouteCollection {
     func boot(router: Router) throws {
         router.get(use: dashboardHandler)
+        router.get("records", Record.parameter, use: recordHandler)
         router.get("records", use: allRecordsHandler)
         router.get("mapping", use: allMappingsHandler)
         router.post(Mapping.self, at: "create-mapping") { request, mapping -> Future<Response> in
@@ -27,6 +28,13 @@ struct WebsiteController: RouteCollection {
         ) { temperatures, buttonPresses in
             let context = DashboardContext(title: "Dashboard", temperatures: temperatures, buttonPresses: buttonPresses)
             return try req.view().render("index", context)
+        }
+    }
+
+    func recordHandler(_ req: Request) throws -> Future<View> {
+        return try req.parameters.next(Record.self).flatMap(to: View.self) { record in
+            let context = RecordContext(title: record.type, record: record)
+            return try req.view().render("record", context)
         }
     }
 
@@ -56,6 +64,11 @@ struct DashboardContext: Encodable {
     let title: String
     let temperatures: [Record]
     let buttonPresses: [Record]
+}
+
+struct RecordContext: Encodable {
+    let title: String
+    let record: Record
 }
 
 struct AllRecordsContext: Encodable {

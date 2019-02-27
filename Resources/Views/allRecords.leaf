@@ -1,3 +1,16 @@
+#set("script") {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+<script src="/scripts/utils.js"></script>
+<script src="/scripts/dashboard.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	console.log('document ready');
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    \});
+\});
+</script>
+}
 #set("content") {
 	<h1>All Records</h1>
 	#if(count(records) > 0) {
@@ -5,26 +18,20 @@
 		<thead class="thead-light">
 			<tr>
 				<th hidden>UUID</th>
-                                <th>Area</th>
-                                <th>Layer</th>
-				<th>UUID</th>
-				<th>Type</th>
+				<th>Area</th>
+				<th>Layer</th>
 				<th>Value</th>
 				<th>Record Time</th>
-				<th>Sender Id</th>
 			</tr>
 		</thead>
 		<tbody>
 			#for(record in records) {
-			<tr>
+			<tr class="clickable-row" data-href="/records/#(record.id)">
 				<td hidden>#(record.id)</td>
-                                <td>#(record.areaName)</td>
-                                <td>#(record.layerName)</td>
-				<td>#(record.id)</td>
-				<td>#(record.type)</td>
+				<td>#(record.areaName)</td>
+				<td>#(record.layerName)</td>
 				<td>#(record.value)</td>
 				<td>#datetimeStr(record.recordTime)</td>
-				<td>#(record.senderId)</td>
 			</tr>
 			}
 		</tbody>
