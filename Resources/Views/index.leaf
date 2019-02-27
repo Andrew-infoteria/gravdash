@@ -4,8 +4,11 @@
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
 window.onload = function () {
+	#for(record in buttonPresses) {
+		console.log(#(record.value));
+	}
 	var datasets = []
-	#for(record in records) {
+	#for(record in temperatures) {
 		var senderId = "#(record.senderId)";
 		if (!datasets.hasOwnProperty(senderId)) {
 			datasets[senderId] = [];

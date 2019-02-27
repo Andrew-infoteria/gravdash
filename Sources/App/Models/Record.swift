@@ -5,11 +5,13 @@ import FluentPostgreSQL
 final class Record: Codable {
     var id: UUID?
     var value: String
+    var type: String
     var recordTime: String
     var senderId: String
 
-    init(value: String, recordTime: String, senderId: String) {
+    init(value: String, type:String, recordTime: String, senderId: String) {
         self.value = value
+        self.type = type
         self.recordTime = recordTime
         self.senderId = senderId
     }

@@ -5,6 +5,7 @@
 		<thead class="thead-light">
 			<tr>
 				<th>UUID</th>
+				<th>Type</th>
 				<th>Value</th>
 				<th>Record Time</th>
 				<th>Sender Id</th>
@@ -14,6 +15,7 @@
 			#for(record in records) {
 			<tr>
 				<td>#(record.id)</td>
+				<td>#(record.type)</td>
 				<td>#(record.value)</td>
 				<td>#datetimeStr(record.recordTime)</td>
 				<td>#(record.senderId)</td>

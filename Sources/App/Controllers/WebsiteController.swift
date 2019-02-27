@@ -12,8 +12,11 @@ struct WebsiteController: RouteCollection {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
-        return Record.query(on: req).filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all().flatMap(to: View.self) { records in
-            let context = DashboardContext(title: "Dashboard", records: records)
+        return flatMap(
+            Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
+            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        ) { temperatures, buttonPresses in
+            let context = DashboardContext(title: "Dashboard", temperatures: temperatures, buttonPresses: buttonPresses)
             return try req.view().render("index", context)
         }
     }
@@ -31,7 +34,8 @@ struct WebsiteController: RouteCollection {
 
 struct DashboardContext: Encodable {
     let title: String
-    let records: [Record]
+    let temperatures: [Record]
+    let buttonPresses: [Record]
 }
 
 struct AllRecordsContext: Encodable {
