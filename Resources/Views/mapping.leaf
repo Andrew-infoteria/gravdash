@@ -1,0 +1,47 @@
+#set("content") {
+<h1>Add New Mapping</h1>
+<form action="/create-mapping" method="POST">
+    <input type="senderId" name="senderId" placeholder="Sender ID" />
+    <input type="tag" name="tag" placeholder="Tagname" />
+    <input type="submit" />
+</form>
+
+<br><br>
+
+<h1>Mapping Settings</h1>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th hidden>ID</th>
+                <th>Sender ID</th>
+                <th>Tagname</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        #if(mappings){
+            #for(mapping in mappings) {
+            <tr>
+                
+                <td>#(mapping.senderId)</td>
+                <td>#(mapping.tag)</td>
+                <td>
+                    <form action"/mapping" method="POST">
+                        <input type="hidden" name="mappingId" value="#(mapping.id)"/>
+                    <input type="submit" value="Delete" /></td>
+                    </form>
+                </td>
+            </tr>
+            
+            }
+        } else {
+            <tr>
+                <td colspan=2>There aren't any sender ID yet.</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+
+}
+#embed("base")

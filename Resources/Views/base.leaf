@@ -21,6 +21,9 @@
 				<li class="nav-item #if(title == "All Records"){active}">
 					<a href="/records" class="nav-link">All Records</a>
 				</li>
+                <li class="nav-item #if(title == "Preference"){active}">
+                    <a href="/mapping" class="nav-link">Preference</a>
+                </li>
 			</ul>
 		</div>
 	</nav>

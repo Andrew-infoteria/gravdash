@@ -6,6 +6,14 @@ struct WebsiteController: RouteCollection {
     func boot(router: Router) throws {
         router.get(use: dashboardHandler)
         router.get("records", use: allRecordsHandler)
+        router.get("mapping", use: allMappingsHandler)
+        router.post(Mapping.self, at: "create-mapping") { request, mapping -> Future<Response> in
+            return mapping.save(on: request)
+            .transform(to: request.redirect(to: "mapping"))
+        }
+        router.post(DeleteRequest.self, at: "mapping") { request, deleteRequest -> Future<Response> in
+            return Mapping.query(on: request).filter(\.id == deleteRequest.mappingId) .first().unwrap(or :Abort(.badRequest)).delete(on: request) .transform(to :request.redirect(to: "mapping"))
+        }
     }
 
     func dashboardHandler(_ req: Request) throws -> Future<View> {
@@ -27,6 +35,17 @@ struct WebsiteController: RouteCollection {
             return try req.view().render("allRecords", context)
         }
     }
+    
+    func allMappingsHandler(_ req: Request) throws -> Future<View> {
+        //let distinctModels = req.withPooledConnection(to: .psql) { (conn) -> Future<[Record]> in
+        //    conn.raw("\"select distinct \"senderId\" from \"Record\";\"")
+        //       .all(decoding: Record.self)
+        //}
+        return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
+            let context = AllMappingsContext(title: "Mapping Settings", mappings: mappings)
+            return try req.view().render("mapping", context)
+        }
+    }
 }
 
 struct DashboardContext: Encodable {
@@ -37,4 +56,13 @@ struct DashboardContext: Encodable {
 struct AllRecordsContext: Encodable {
     let title: String
     let records: [Record]
+}
+
+struct AllMappingsContext: Encodable {
+    let title: String
+    let mappings: [Mapping]
+}
+
+struct DeleteRequest: Content {
+    let mappingId: Int
 }
