@@ -12,9 +12,10 @@ struct WebsiteController: RouteCollection {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
+        let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
         return flatMap(
             Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
-            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
         ) { temperatures, buttonPresses in
             let context = DashboardContext(title: "Dashboard", temperatures: temperatures, buttonPresses: buttonPresses)
             return try req.view().render("index", context)
