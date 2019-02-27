@@ -19,7 +19,7 @@ final class DateTimeTag: TagRenderer {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"
         let date = formatter.date(from: string);
         formatter.timeZone = TimeZone.current
-        formatter.dateFormat = "dd MMMM yyyy, h:mm a"
+        formatter.dateFormat = "EEEE, dd MMMM yyyy, h:mm a"
         return tag.container.future(.string(formatter.string(from: date!)))
     }
 }
