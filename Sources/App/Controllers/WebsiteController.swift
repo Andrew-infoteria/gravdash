@@ -47,7 +47,7 @@ struct WebsiteController: RouteCollection {
     
     func allMappingsHandler(_ req: Request) throws -> Future<View> {
         return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
-            let context = AllMappingsContext(title: "Mapping Settings", mappings: mappings)
+            let context = AllMappingsContext(title: "Settings", mappings: mappings)
             return try req.view().render("mapping", context)
         }
     }
