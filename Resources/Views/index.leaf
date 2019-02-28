@@ -4,14 +4,18 @@
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
 window.onload = function () {
-	var tDatasets = []
+	var mappings = [];
+	#for(mapping in mappings) {
+		mappings["#(mapping.senderId)"] = "#(mapping.tag)";
+	}
+	var tDatasets = [];
 	#for(record in temperatures) {
-		var senderId = "#(record.areaName)"; // temporary changed from record.senderId
+		var senderId = "#(record.senderId)";
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		addDataToDataset(data, tDatasets, senderId);
+		addDataToDataset(data, tDatasets, mappings[senderId]);
 	}
 	loadTemperatureChart(tDatasets);
-	var buttonPresses = []
+	var buttonPresses = [];
 	#for(record in buttonPresses) {
 		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
 	}

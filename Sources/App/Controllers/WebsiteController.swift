@@ -21,13 +21,14 @@ struct WebsiteController: RouteCollection {
         let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
         return flatMap(
             Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
-            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
-        ) { temperatures, buttonPresses in
+            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all(),
+            Mapping.query(on: req).all()
+        ) { temperatures, buttonPresses, mappings in
             let values = temperatures.map({ Float($0.value)! })
             let min = String(format: "%.2f", values.min()!)
             let max = String(format: "%.2f", values.max()!)
             let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
-            let context = DashboardContext(title: "Dashboard", temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses)
+            let context = DashboardContext(title: "Dashboard", temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses, mappings: mappings)
             return try req.view().render("index", context)
         }
     }
@@ -70,6 +71,7 @@ struct DashboardContext: Encodable {
     let max: String
     let average: String
     let buttonPresses: [Record]
+    let mappings: [Mapping]
 }
 
 struct RecordContext: Encodable {
