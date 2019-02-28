@@ -49,23 +49,23 @@ function addDataToDataset(data, datasets, name) {
     <table width="100%">
         <tr>
             <td rowspan="3" width="90%">
-	<canvas id="temperature-chart" width="400" height="200"></canvas>
+				<canvas id="temperature-chart" width="400" height="200"></canvas>
             </td>
             <td align="center">
                 <div> <u>Max Today</u> </div>
-                <div> <font size="6"><b>26.1ºC</b></font> </div>
+                <div> <font size="6"><b>#(max)</b></font> </div>
             </td>
         </tr>
         <tr>
             <td align="center">
                 <div> <u>Average Today</u> </div>
-                <div> <font size="6"><b>25ºC</b></font> </div>
+                <div> <font size="6"><b>#(average)</b></font> </div>
             </td>
         </tr>
         <tr>
             <td align="center">
                 <div> <u>Min Today</u> </div>
-                <div> <font size="6"><b>24.4ºC</b></font> </div>
+                <div> <font size="6"><b>#(min)</b></font> </div>
             </td>
         </tr>
     </table>

@@ -23,7 +23,11 @@ struct WebsiteController: RouteCollection {
             Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
             Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
         ) { temperatures, buttonPresses in
-            let context = DashboardContext(title: "Dashboard", temperatures: temperatures, buttonPresses: buttonPresses)
+            let values = temperatures.map({ Float($0.value)! })
+            let min = String(format: "%.2f", values.min()!)
+            let max = String(format: "%.2f", values.max()!)
+            let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
+            let context = DashboardContext(title: "Dashboard", temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses)
             return try req.view().render("index", context)
         }
     }
@@ -62,6 +66,9 @@ struct WebsiteController: RouteCollection {
 struct DashboardContext: Encodable {
     let title: String
     let temperatures: [Record]
+    let min: String
+    let max: String
+    let average: String
     let buttonPresses: [Record]
 }
 
