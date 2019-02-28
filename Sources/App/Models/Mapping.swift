@@ -14,7 +14,14 @@ final class Mapping: Content {
     }
 }
 
+extension Mapping: Migration {
+    public static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
+        return Database.create(self, on: connection) { builder in
+            try addProperties(to: builder)
+            builder.unique(on: \.senderId)
+        }
+    }
+}
 
 extension Mapping: PostgreSQLModel {}
-extension Mapping: Migration {}
 extension Mapping: Parameter {}
