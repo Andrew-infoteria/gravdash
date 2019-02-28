@@ -8,10 +8,7 @@ struct WebsiteController: RouteCollection {
         router.get("records", Record.parameter, use: recordHandler)
         router.get("records", use: allRecordsHandler)
         router.get("mapping", use: allMappingsHandler)
-        router.post(Mapping.self, at: "create-mapping") { request, mapping -> Future<Response> in
-            return mapping.save(on: request)
-            .transform(to: request.redirect(to: "mapping"))
-        }
+        router.post(Mapping.self, at: "create-mapping", use: createMappingPostHandler)
         router.post(DeleteRequest.self, at: "mapping") { request, deleteRequest -> Future<Response> in
             return Mapping.query(on: request).filter(\.id == deleteRequest.mappingId) .first().unwrap(or :Abort(.badRequest)).delete(on: request) .transform(to :request.redirect(to: "mapping"))
         }
@@ -49,14 +46,16 @@ struct WebsiteController: RouteCollection {
     }
     
     func allMappingsHandler(_ req: Request) throws -> Future<View> {
-        //let distinctModels = req.withPooledConnection(to: .psql) { (conn) -> Future<[Record]> in
-        //    conn.raw("\"select distinct \"senderId\" from \"Record\";\"")
-        //       .all(decoding: Record.self)
-        //}
         return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
             let context = AllMappingsContext(title: "Mapping Settings", mappings: mappings)
             return try req.view().render("mapping", context)
         }
+    }
+
+    func createMappingPostHandler(_ req: Request, mapping: Mapping) throws -> Future<Response> {
+        return mapping.save(on: req).catchMap { error in
+            return mapping
+        }.transform(to: req.redirect(to: "/mapping"))
     }
 }
 
