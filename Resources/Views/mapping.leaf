@@ -1,8 +1,8 @@
 #set("content") {
 <h1>Add New Mapping</h1>
 <form action="/create-mapping" method="POST">
-    <input type="senderId" name="senderId" placeholder="Sender ID" />
-    <input type="tag" name="tag" placeholder="Tagname" />
+    <input type="senderId" name="senderId" placeholder="Sender ID" size="40"/>
+    <input type="tag" name="tag" placeholder="Tagname" size="40"/>
     <input type="submit" />
 </form>
 

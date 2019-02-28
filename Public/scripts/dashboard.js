@@ -52,7 +52,7 @@ function loadTemperatureChart (datasets) {
 				yAxes: [{
 					type: 'linear',
 					ticks: {
-						suggestedMin: 22
+						suggestedMin: 24
 					},
 					scaleLabel: {
 						display: true,

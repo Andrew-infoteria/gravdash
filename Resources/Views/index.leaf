@@ -6,7 +6,7 @@
 window.onload = function () {
 	var tDatasets = []
 	#for(record in temperatures) {
-		var senderId = "#(record.senderId)";
+		var senderId = "#(record.areaName)"; // temporary changed from record.senderId
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
 		addDataToDataset(data, tDatasets, senderId);
 	}
@@ -46,7 +46,31 @@ function addDataToDataset(data, datasets, name) {
 }
 #set("content") {
 	<h1>Dashboard</h1>
-	<canvas id="temperature-chart" width="400" height="250"></canvas>
-	<canvas id="button-press-chart" width="400" height="250"></canvas>
+    <table width="100%">
+        <tr>
+            <td rowspan="3" width="90%">
+	<canvas id="temperature-chart" width="400" height="200"></canvas>
+            </td>
+            <td align="center">
+                <div> <u>Max Today</u> </div>
+                <div> <font size="6"><b>26.1ºC</b></font> </div>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <div> <u>Average Today</u> </div>
+                <div> <font size="6"><b>25ºC</b></font> </div>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <div> <u>Min Today</u> </div>
+                <div> <font size="6"><b>24.4ºC</b></font> </div>
+            </td>
+        </tr>
+    </table>
+                
+    <br><br>
+	<canvas id="button-press-chart" width="400" height="200"></canvas>
 }
 #embed("base")
