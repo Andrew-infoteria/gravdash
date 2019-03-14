@@ -20,11 +20,13 @@ struct WebsiteController: RouteCollection {
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
         let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
         return flatMap(
+            Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= yesterday).sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest)),
             Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").filter(\.recordTime >= yesterday).sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest)),
             Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
             Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all(),
             Mapping.query(on: req).all()
-        ) { vibrations, temperatures, buttonPresses, mappings in
+        ) { doors, vibrations, temperatures, buttonPresses, mappings in
+            let door = doors.value
             let vibration = vibrations.value
             //let vvalues = vibrations.map({ Float($0.value)! })
             //let last = String(format: "%.2f", vvalues.isEmpty ? 0 : vvalues.min()!)
@@ -32,7 +34,7 @@ struct WebsiteController: RouteCollection {
             let min = String(format: "%.2f", values.isEmpty ? 0 : values.min()!)
             let max = String(format: "%.2f", values.isEmpty ? 0 : values.max()!)
             let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
-            let context = DashboardContext(title: "Dashboard", vibration: vibration, temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses, mappings: mappings)
+            let context = DashboardContext(title: "Dashboard", door: door, vibration: vibration, temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses, mappings: mappings)
             return try req.view().render("index", context)
         }
     }
@@ -70,7 +72,7 @@ struct WebsiteController: RouteCollection {
 
 struct DashboardContext: Encodable {
     let title: String
-    //let vibrations: [Record]
+    let door: String
     let vibration: String
     let temperatures: [Record]
     let min: String
