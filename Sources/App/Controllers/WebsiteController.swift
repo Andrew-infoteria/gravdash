@@ -25,8 +25,8 @@ struct WebsiteController: RouteCollection {
             Mapping.query(on: req).all()
         ) { temperatures, buttonPresses, mappings in
             let values = temperatures.map({ Float($0.value)! })
-            let min = String(format: "%.2f", values.min()!)
-            let max = String(format: "%.2f", values.max()!)
+            let min = String(format: "%.2f", values.isEmpty ? 0 : values.min()!)
+            let max = String(format: "%.2f", values.isEmpty ? 0 : values.max()!)
             let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
             let context = DashboardContext(title: "Dashboard", temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses, mappings: mappings)
             return try req.view().render("index", context)

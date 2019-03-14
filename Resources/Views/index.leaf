@@ -50,26 +50,61 @@ function addDataToDataset(data, datasets, name) {
 }
 #set("content") {
 	<h1>Dashboard</h1>
+    <br><br>
     <table width="100%">
         <tr>
-            <td rowspan="3" width="90%">
+            <td>
+                <p><u>Main Door</u></p>
+                <h3><i class="fas fa-door-closed"></i> <i class="fas fa-door-open"></i></h3>
+                <p> <b>Closed Opened</b> </p>
+            </td>
+            <td>
+                <p><u>People in Office</u></p>
+                <h3>
+                    <i class="fas fa-male"></i><i class="fas fa-male"></i><i class="fas fa-male"></i><i class="fas fa-male"></i>
+                    
+                    <i class="fas fa-female"></i>
+                </h3>
+                <p> <b>4 Male | 1 Female</b> </p>
+            </td>
+            <td>
+                <p><u>Vibration Sensor</u></p>
+                <h3><i class="fas fa-check-circle"></i> <i class="fas fa-exclamation-circle"></i></h3>
+                <p> <b>Stable Unstable</b> </p>
+            </td>
+            <td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:center;" colspan="2">
+                <p>28 Feb</p>
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="3" colspan="3" width="90%">
+                <br><br>
 				<canvas id="temperature-chart" width="400" height="200"></canvas>
             </td>
-            <td align="center">
+            <td>
+                <h3><i class="fas fa-thermometer-three-quarters"></i></h3>
+            </td>
+            <td>
                 <div> <u>Max Today</u> </div>
-                <div> <font size="6"><b>#(max)</b></font> </div>
+                <p><b>#(max)ºC</b> </p>
             </td>
         </tr>
         <tr>
-            <td align="center">
+            <td>
+                <h3><i class="fas fa-thermometer-half"></i></h3>
+            </td>
+            <td styletext-align="left">
                 <div> <u>Average Today</u> </div>
-                <div> <font size="6"><b>#(average)</b></font> </div>
+                <p> <b>#(average)ºC</b> </p>
             </td>
         </tr>
         <tr>
-            <td align="center">
+            <td>
+                <h3><i class="fas fa-thermometer-quarter"></i></h3>
+            </td>
+            <td>
                 <div> <u>Min Today</u> </div>
-                <div> <font size="6"><b>#(min)</b></font> </div>
+                <p> <b>#(min)ºC</b> </p>
             </td>
         </tr>
     </table>
