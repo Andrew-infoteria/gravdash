@@ -1,5 +1,6 @@
 #set("script") {
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript">
 jQuery(document).ready(function($) {
@@ -8,9 +9,29 @@ jQuery(document).ready(function($) {
 		window.location = $(this).data("href");
 	\});
 	$("#records").DataTable({
+		"ajax": {
+			"url": "/api/records",
+			"dataSrc": ""
+		\},
+		"deferRender": true,
+		"columns": [
+			{ "data": "id"\},
+			{ "data": "areaName" \},
+			{ "data": "layerName" \},
+			{ "data": "type" \},
+			{ "data": "value" \},
+			{ "data": "recordTime" \},
+			{ "data": "recordTime", "render": function ( data, type, row, meta ) {
+				return moment(new Date(data)).format('dddd, DD MMMM YYYY, h:mm a');;
+		    \}\}
+		],
 		"lengthMenu": [ [10, 20, 50, -1], [10, 20, 50, "All"] ],
-		"order": [[ 5, "asc" ]],
-		"columnDefs": [{ "orderable": false, "targets": [1,2,3,4] \}]
+		"order": [[ 5, "desc" ]],
+		"columnDefs": [
+			{ "className": " text-left", "orderable": false, "targets": [0,1,2,3,4,5,6] \},
+			{ "visible": false, "targets": [0,5] \},
+			{ "searchable": false, "targets": [5] \}
+		]
 	\});
 \});
 </script>
@@ -25,25 +46,18 @@ jQuery(document).ready(function($) {
 	<table id="records" class="table table-bordered table-hover">
 		<thead class="thead-light">
 			<tr>
-				<th hidden>UUID</th>
+				<th>UUID</th>
 				<th>Area</th>
 				<th>Layer</th>
 				<th>Type</th>
 				<th>Value</th>
+				<th>ISO Time</th>
 				<th>Record Time</th>
 			</tr>
 		</thead>
 		<tbody>
-			#for(record in records) {
 			<tr class="clickable-row" data-href="/records/#(record.id)">
-				<td hidden>#(record.id)</td>
-				<td>#(record.areaName)</td>
-				<td>#(record.layerName)</td>
-				<td>#(record.type)</td>
-				<td>#(record.value)</td>
-				<td>#datetimeStr(record.recordTime)</td>
 			</tr>
-			}
 		</tbody>
 	</table>
 	} else {
