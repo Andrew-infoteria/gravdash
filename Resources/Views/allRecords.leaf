@@ -4,11 +4,7 @@
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-	console.log('document ready');
-	$(".clickable-row").click(function() {
-		window.location = $(this).data("href");
-	\});
-	$("#records").DataTable({
+	var table = $("#records").DataTable({
 		"ajax": {
 			"url": "/api/records",
 			"dataSrc": ""
@@ -33,6 +29,10 @@ jQuery(document).ready(function($) {
 			{ "searchable": false, "targets": [5] \}
 		]
 	\});
+	$('#records tbody').on('click', 'tr', function () {
+        var record = table.row(this).data();
+        window.location = "/records/" + record.id;
+    \});
 \});
 </script>
 }
@@ -56,8 +56,6 @@ jQuery(document).ready(function($) {
 			</tr>
 		</thead>
 		<tbody>
-			<tr class="clickable-row" data-href="/records/#(record.id)">
-			</tr>
 		</tbody>
 	</table>
 	} else {
