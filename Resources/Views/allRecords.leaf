@@ -4,14 +4,14 @@
 <script type="text/javascript">
 jQuery(document).ready(function($) {
 	console.log('document ready');
-    $(".clickable-row").click(function() {
-        window.location = $(this).data("href");
-    \});
-    $("#records").DataTable({
-    	"lengthMenu": [ [10, 20, 50, -1], [10, 20, 50, "All"] ],
-    	"order": [[ 4, "asc" ]],
-    	"columnDefs": [{ "orderable": false, "targets": [1,2,3] \}]
-    \});
+	$(".clickable-row").click(function() {
+		window.location = $(this).data("href");
+	\});
+	$("#records").DataTable({
+		"lengthMenu": [ [10, 20, 50, -1], [10, 20, 50, "All"] ],
+		"order": [[ 5, "asc" ]],
+		"columnDefs": [{ "orderable": false, "targets": [1,2,3,4] \}]
+	\});
 \});
 </script>
 }
@@ -28,6 +28,7 @@ jQuery(document).ready(function($) {
 				<th hidden>UUID</th>
 				<th>Area</th>
 				<th>Layer</th>
+				<th>Type</th>
 				<th>Value</th>
 				<th>Record Time</th>
 			</tr>
@@ -38,6 +39,7 @@ jQuery(document).ready(function($) {
 				<td hidden>#(record.id)</td>
 				<td>#(record.areaName)</td>
 				<td>#(record.layerName)</td>
+				<td>#(record.type)</td>
 				<td>#(record.value)</td>
 				<td>#datetimeStr(record.recordTime)</td>
 			</tr>
