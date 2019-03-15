@@ -30,9 +30,12 @@ jQuery(document).ready(function($) {
 		]
 	\});
 	$('#records tbody').on('click', 'tr', function () {
-        var record = table.row(this).data();
-        window.location = "/records/" + record.id;
-    \});
+		var record = table.row(this).data();
+		window.location = "/records/" + record.id;
+	\});
+	setInterval( function () {
+		table.ajax.reload(null, false);
+	\}, 30000);
 \});
 </script>
 }
