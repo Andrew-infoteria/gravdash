@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
 #set("content") {
 	<h1>All Records</h1>
 	#if(count(records) > 0) {
-	<table id="records" class="table table-bordered table-hover">
+	<table id="records" class="table table-bordered table-hover" width="100%">
 		<thead class="thead-light">
 			<tr>
 				<th>UUID</th>
