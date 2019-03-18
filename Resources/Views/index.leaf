@@ -55,12 +55,20 @@ function addDataToDataset(data, datasets, name) {
         <tr>
             <td>
                 <p><u>Main Door</u></p>
-                #if(door > 0){
-                    <h3><i class="fas fa-door-open"></i></h3>
-                    <p> <b>Opened</b> </p>
+                #if(doors){
+                #for(door in doors) {
+                    #if(isLast){
+                        #if(door.value > 0){
+                            <h3><i class="fas fa-door-open"></i></h3>
+                            <p> <b>Opened</b> </p>
+                        } else {
+                            <h3><i class="fas fa-door-closed"></i></h3>
+                            <p> <b>Closed</b> </p>
+                        }
+                    }
+                }
                 } else {
-                    <h3><i class="fas fa-door-closed"></i></h3>
-                    <p> <b>Closed</b> </p>
+                    <p> No Door state data!</p>
                 }
             </td>
             <td>
@@ -73,12 +81,20 @@ function addDataToDataset(data, datasets, name) {
             </td>
             <td>
                 <p><u>Vibration Sensor</u></p>
-                #if(vibration > 0){
-                    <h3><i class="fas fa-exclamation-circle"></i></h3>
-                    <p> <b>Slight Movement</b> </p>
+                #if(vibrations){
+                #for(bibration in vibrations){
+                    #if(isLast){
+                        #if(vibration.value > 0){
+                            <h3><i class="fas fa-exclamation-circle"></i></h3>
+                            <p> <b>Slight Movement</b> </p>
+                        } else {
+                            <h3><i class="fas fa-check-circle"></i></h3>
+                            <p> <b>Stable</b> </p>
+                        }
+                    }
+                }
                 } else {
-                    <h3><i class="fas fa-check-circle"></i></h3>
-                    <p> <b>Stable</b> </p>
+                    <p> No Vibration data!</p>
                 }
             </td>
             <td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
