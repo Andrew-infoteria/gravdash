@@ -1,5 +1,6 @@
 function loadTemperatureChart (datasets) {
 	var ctx = document.getElementById("temperature-chart");
+	if (!ctx) return;
     var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
     var chartDatasets = [];
     for (var key in datasets) {

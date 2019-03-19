@@ -19,22 +19,43 @@ struct WebsiteController: RouteCollection {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
         let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
-        return flatMap(
-            Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= yesterday).sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest)),
-            Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").filter(\.recordTime >= yesterday).sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest)),
-            Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all(),
-            Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all(),
-            Mapping.query(on: req).all()
-        ) { doors, vibrations, temperatures, buttonPresses, mappings in
-            let door = doors.value
-            let vibration = vibrations.value
-            //let vvalues = vibrations.map({ Float($0.value)! })
-            //let last = String(format: "%.2f", vvalues.isEmpty ? 0 : vvalues.min()!)
+
+        let temperatureFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let humidityFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Humidity").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let buttonPressFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
+        let doorStateFuture: Future<Record> = Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= yesterday).sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest))
+        let occupancyFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Motion Detected").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let vibrationFuture: Future<Record> = Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").sort(\.recordTime, .descending).first().unwrap(or :Abort(.badRequest))
+        let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();
+        return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture) { temperatures, humidities, buttonPresses, doorState, occupancies in
             let values = temperatures.map({ Float($0.value)! })
             let min = String(format: "%.2f", values.isEmpty ? 0 : values.min()!)
             let max = String(format: "%.2f", values.isEmpty ? 0 : values.max()!)
             let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
-            let context = DashboardContext(title: "Dashboard", door: door, vibration: vibration, temperatures: temperatures, min: min, max: max, average: average, buttonPresses: buttonPresses, mappings: mappings)
+            let tempCtx = TemperaturePanelContext(temperatures: temperatures, min: min, max: max, average: average)
+            let humidCtx = HumidityPanelContext(humidity: humidities)
+            let btnCtx = ButtonPressPanelContext(buttonPresses: buttonPresses)
+            let doorCtx = DoorStatePanelContext(current: doorState)
+            let occupCtx = OccupancyPanelContext(occupancies: occupancies)
+
+            var context = DashboardContext(title: "Dashboard")
+            context.temperaturePanel = tempCtx
+            context.humidityPanel = humidCtx
+            context.buttonPressPanel = btnCtx
+            context.doorStatePanel = doorCtx
+            context.occupancyPanel = occupCtx
+            return context
+        }.flatMap(to: DashboardContext.self) { dashboard in
+            var context = dashboard
+            return map(vibrationFuture, mappingFuture) { vibration, mappings in
+                let vibrateCtx = VibrationPanelContext(current: vibration)
+                
+                context.vibrationPanel = vibrateCtx
+                context.mappings = mappings
+                return context
+            }
+
+        }.flatMap(to: View.self) { context in
             return try req.view().render("index", context)
         }
     }
@@ -72,14 +93,44 @@ struct WebsiteController: RouteCollection {
 
 struct DashboardContext: Encodable {
     let title: String
-    let door: String
-    let vibration: String
+    var temperaturePanel: TemperaturePanelContext? = nil
+    var humidityPanel: HumidityPanelContext? = nil
+    var buttonPressPanel: ButtonPressPanelContext? = nil
+    var doorStatePanel: DoorStatePanelContext? = nil
+    var occupancyPanel: OccupancyPanelContext? = nil
+    var vibrationPanel: VibrationPanelContext? = nil
+    var mappings: [Mapping]? = nil
+
+    init(title: String) {
+        self.title = title
+    }
+}
+
+struct TemperaturePanelContext: Encodable {
     let temperatures: [Record]
     let min: String
     let max: String
     let average: String
+}
+
+struct HumidityPanelContext: Encodable {
+    let humidity: [Record]
+}
+
+struct ButtonPressPanelContext: Encodable {
     let buttonPresses: [Record]
-    let mappings: [Mapping]
+}
+
+struct DoorStatePanelContext: Encodable {
+    let current: Record
+}
+
+struct OccupancyPanelContext: Encodable {
+    let occupancies: [Record]
+}
+
+struct VibrationPanelContext: Encodable {
+    let current: Record
 }
 
 struct RecordContext: Encodable {
