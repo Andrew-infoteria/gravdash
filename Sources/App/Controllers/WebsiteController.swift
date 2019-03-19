@@ -19,11 +19,12 @@ struct WebsiteController: RouteCollection {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
         let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
+        let week = formatter.string(from: Calendar.current.date(byAdding: .day, value: -7, to: Date())!)
 
         let temperatureFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let humidityFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Humidity").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let buttonPressFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
-        let doorStateFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let doorStateFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= week).sort(\.recordTime, .ascending).all()
         let occupancyFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Motion Detected").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let vibrationFuture: Future<[Record]> = Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();

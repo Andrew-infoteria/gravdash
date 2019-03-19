@@ -135,19 +135,70 @@ function loadHumidityChart (datasets) {
 	});
 }
 
-function loadButtonPressChart (datasets, bound) {
-	var ctx = document.getElementById("button-press-chart");
-    var barColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
-    var chartDatasets = []
-    for (var key in datasets) {
-    	var chartDataset = {
-            label: key,
+function loadDoorOpenChart (datasets, bound) {
+	var ctx = document.getElementById("door-open-chart");
+	var barColors = [window.chartColors.green, window.chartColors.red];
+	var chartDatasets = []
+	for (var key in datasets) {
+		var chartDataset = {
+			label: key,
 			backgroundColor: barColors.shift(),
 			fill: false,
-            data: datasets[key]
-        }
-        chartDatasets.push(chartDataset)
-    }
+			data: datasets[key]
+		}
+		chartDatasets.push(chartDataset)
+	}
+	var myBarChart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: bound,
+			datasets: chartDatasets
+		},
+		options: {
+			title: {
+				display: true,
+				fontSize: 20,
+				text: 'Door Open'
+			},
+			legend: {
+				position: 'bottom'
+			},
+			scales: {
+				xAxes: [{
+					type: 'time',
+					display: true,
+					time: {
+						unit: 'day'
+					}
+				}],
+				yAxes: [{
+					ticks: {
+						min: 0
+					},
+					scaleLabel: {
+						display: true,
+						labelString: 'Number of times',
+						fontSize: 20
+					}
+				}]
+			}
+		}
+	});
+}
+
+function loadButtonPressChart (datasets, bound) {
+	var ctx = document.getElementById("button-press-chart");
+	var barColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+	var chartDatasets = []
+	for (var key in datasets) {
+		var chartDataset = {
+			label: key,
+			backgroundColor: barColors.shift(),
+			fill: false,
+			data: datasets[key]
+		}
+		chartDatasets.push(chartDataset)
+	}
 	var myBarChart = new Chart(ctx, {
 		type: 'bar',
 		data: {
@@ -163,14 +214,14 @@ function loadButtonPressChart (datasets, bound) {
 			legend: {
 				position: 'bottom'
 			},
-	        scales: {
-	            xAxes: [{
-	                type: 'time',
-	                display: true,
-	                time: {
-	                	unit: 'day'
-	                }
-	            }],
+			scales: {
+				xAxes: [{
+					type: 'time',
+					display: true,
+					time: {
+						unit: 'day'
+					}
+				}],
 				yAxes: [{
 					ticks: {
 						min: 0
@@ -181,7 +232,7 @@ function loadButtonPressChart (datasets, bound) {
 						fontSize: 20
 					}
 				}]
-	        }
+			}
 		}
 	});
 }
@@ -189,7 +240,7 @@ function loadButtonPressChart (datasets, bound) {
 function getYAverage(records) {
 	var total = 0;
 	for(var i = 0; i < records.length; i++) {
-	    total += records[i].y;
+		total += records[i].y;
 	}
 	return total / records.length;
 }

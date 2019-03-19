@@ -22,6 +22,26 @@ window.onload = function () {
 		addDataToDataset(data, hDatasets, mappings[senderId]);
 	}
 	loadHumidityChart(hDatasets);
+	var doorStates = [];
+	#for(record in doorStatePanel.doorStates) {
+		doorStates.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
+	}
+	var datas = [];
+	for (var i = 0; i < doorStates.length; i++) {
+		var record = doorStates[i];
+		addDataToDataset(record, datas, record.recordTime.substring(0,10));
+	\}
+	var dDatasets = [];
+	dDatasets['Open'] = [];
+	for (var key in datas) {
+		dDatasets['Open'].push({x: key, y: datas[key].filter(record => record.value == 1).length\});
+	\}
+	var firstDate = new Date(doorStates.reduce((min, r) => r.recordTime < min ? r.recordTime : min, doorStates[0].recordTime));
+	var lastDate = new Date(doorStates.reduce((max, r) => r.recordTime > max ? r.recordTime : max, doorStates[0].recordTime));
+	firstDate.setDate(firstDate.getDate() - 1);
+	lastDate.setDate(lastDate.getDate() + 1);
+	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+	loadDoorOpenChart(dDatasets, addBound);
 	var buttonPresses = [];
 	#for(record in buttonPressPanel.buttonPresses) {
 		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
@@ -145,6 +165,10 @@ function addDataToDataset(data, datasets, name) {
 	#if(count(humidityPanel.humidities) > 0){
 	<br><br>
 	<canvas id="humidity-chart" width="400" height="200"></canvas>
+	}
+	#if(count(doorStatePanel.doorStates) > 0){
+	<br><br>
+	<canvas id="door-open-chart" width="400" height="200"></canvas>
 	}
 	<br><br>
 	<canvas id="button-press-chart" width="400" height="200"></canvas>
