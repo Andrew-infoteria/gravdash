@@ -18,3 +18,5 @@
         <img src="http://img.shields.io/badge/swift-4.1-brightgreen.svg" alt="Swift 4.1">
     </a>
 </p>
+<p> This is a dashboard prototype for monitor and control of Gravio linked IoT devices. </p>
+
