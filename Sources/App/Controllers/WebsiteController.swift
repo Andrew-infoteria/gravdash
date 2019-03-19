@@ -34,7 +34,7 @@ struct WebsiteController: RouteCollection {
             let max = String(format: "%.2f", values.isEmpty ? 0 : values.max()!)
             let average = String(format: "%.2f", values.isEmpty ? 0 : values.reduce(0, +) / Float(values.count))
             let tempCtx = TemperaturePanelContext(temperatures: temperatures, min: min, max: max, average: average)
-            let humidCtx = HumidityPanelContext(humidity: humidities)
+            let humidCtx = HumidityPanelContext(humidities: humidities)
             let btnCtx = ButtonPressPanelContext(buttonPresses: buttonPresses)
             let doorCtx = DoorStatePanelContext(doorStates: doorStates)
             let occupCtx = OccupancyPanelContext(occupancies: occupancies)
@@ -115,7 +115,7 @@ struct TemperaturePanelContext: Encodable {
 }
 
 struct HumidityPanelContext: Encodable {
-    let humidity: [Record]
+    let humidities: [Record]
 }
 
 struct ButtonPressPanelContext: Encodable {
