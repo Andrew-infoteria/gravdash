@@ -9,14 +9,14 @@ window.onload = function () {
 		mappings["#(mapping.senderId)"] = "#(mapping.tag)";
 	}
 	var tDatasets = [];
-	#for(record in temperatures) {
+	#for(record in temperaturePanel.temperatures) {
 		var senderId = "#(record.senderId)";
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
 		addDataToDataset(data, tDatasets, mappings[senderId]);
 	}
 	loadTemperatureChart(tDatasets);
 	var buttonPresses = [];
-	#for(record in buttonPresses) {
+	#for(record in buttonPressPanel.buttonPresses) {
 		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
 	}
 	var datas = [];
@@ -55,10 +55,10 @@ function addDataToDataset(data, datasets, name) {
         <tr>
             <td>
                 <p><u>Main Door</u></p>
-                #if(doors){
-                #for(door in doors) {
+                #if(count(doorStatePanel.doorStates) > 0){
+                #for(doorState in doorStatePanel.doorStates) {
                     #if(isLast){
-                        #if(door.value > 0){
+                        #if(doorState.value > 0){
                             <h3><i class="fas fa-door-open"></i></h3>
                             <p> <b>Opened</b> </p>
                         } else {
@@ -81,8 +81,8 @@ function addDataToDataset(data, datasets, name) {
             </td>
             <td>
                 <p><u>Vibration Sensor</u></p>
-                #if(vibrations){
-                #for(bibration in vibrations){
+                #if(count(vibrationPanel.vibrations) > 0){
+                #for(vibration in vibrationPanel.vibrations){
                     #if(isLast){
                         #if(vibration.value > 0){
                             <h3><i class="fas fa-exclamation-circle"></i></h3>
@@ -101,6 +101,7 @@ function addDataToDataset(data, datasets, name) {
                 <p>28 Feb</p>
             </td>
         </tr>
+        #if(count(temperaturePanel.temperatures) > 0) {
         <tr>
             <td rowspan="3" colspan="3" width="88%">
                 <br><br>
@@ -111,7 +112,7 @@ function addDataToDataset(data, datasets, name) {
             </td>
             <td>
                 <div> <u>Max Today</u> </div>
-                <p><b>#(max)ºC</b> </p>
+                <p><b>#(temperaturePanel.max)ºC</b> </p>
             </td>
         </tr>
         <tr>
@@ -120,7 +121,7 @@ function addDataToDataset(data, datasets, name) {
             </td>
             <td styletext-align="left">
                 <div> <u>Average Today</u> </div>
-                <p> <b>#(average)ºC</b> </p>
+                <p> <b>#(temperaturePanel.average)ºC</b> </p>
             </td>
         </tr>
         <tr>
@@ -129,9 +130,10 @@ function addDataToDataset(data, datasets, name) {
             </td>
             <td>
                 <div> <u>Min Today</u> </div>
-                <p> <b>#(min)ºC</b> </p>
+                <p> <b>#(temperaturePanel.min)ºC</b> </p>
             </td>
         </tr>
+        }
     </table>
                 
     <br><br>
