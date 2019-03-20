@@ -15,6 +15,33 @@ window.onload = function () {
 		addDataToDataset(data, tDatasets, mappings[senderId]);
 	}
 	loadTemperatureChart(tDatasets);
+	var hDatasets = [];
+	#for(record in humidityPanel.humidities) {
+		var senderId = "#(record.senderId)";
+		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
+		addDataToDataset(data, hDatasets, mappings[senderId]);
+	}
+	loadHumidityChart(hDatasets);
+	var doorStates = [];
+	#for(record in doorStatePanel.doorStates) {
+		doorStates.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
+	}
+	var datas = [];
+	for (var i = 0; i < doorStates.length; i++) {
+		var record = doorStates[i];
+		addDataToDataset(record, datas, record.recordTime.substring(0,10));
+	\}
+	var dDatasets = [];
+	dDatasets['Open'] = [];
+	for (var key in datas) {
+		dDatasets['Open'].push({x: key, y: datas[key].filter(record => record.value == 1).length\});
+	\}
+	var firstDate = new Date(doorStates.reduce((min, r) => r.recordTime < min ? r.recordTime : min, doorStates[0].recordTime));
+	var lastDate = new Date(doorStates.reduce((max, r) => r.recordTime > max ? r.recordTime : max, doorStates[0].recordTime));
+	firstDate.setDate(firstDate.getDate() - 1);
+	lastDate.setDate(lastDate.getDate() + 1);
+	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+	loadDoorOpenChart(dDatasets, addBound);
 	var buttonPresses = [];
 	#for(record in buttonPressPanel.buttonPresses) {
 		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
@@ -50,93 +77,100 @@ function addDataToDataset(data, datasets, name) {
 }
 #set("content") {
 	<h1>Dashboard</h1>
-    <br><br>
-    <table width="100%">
-        <tr>
-            <td>
-                <p><u>Main Door</u></p>
-                #if(count(doorStatePanel.doorStates) > 0){
-                #for(doorState in doorStatePanel.doorStates) {
-                    #if(isLast){
-                        #if(doorState.value > 0){
-                            <h3><i class="fas fa-door-open"></i></h3>
-                            <p> <b>Opened</b> </p>
-                        } else {
-                            <h3><i class="fas fa-door-closed"></i></h3>
-                            <p> <b>Closed</b> </p>
-                        }
-                    }
-                }
-                } else {
-                    <p> No Door state data!</p>
-                }
-            </td>
-            <td>
-                <p><u>People in Office</u></p>
-                <h3>
-                    <i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i>
-                   
-                </h3>
-                <p> <b>4 Pax</b> </p>
-            </td>
-            <td>
-                <p><u>Vibration Sensor</u></p>
-                #if(count(vibrationPanel.vibrations) > 0){
-                #for(vibration in vibrationPanel.vibrations){
-                    #if(isLast){
-                        #if(vibration.value > 0){
-                            <h3><i class="fas fa-exclamation-circle"></i></h3>
-                            <p> <b>Slight Movement</b> </p>
-                        } else {
-                            <h3><i class="fas fa-check-circle"></i></h3>
-                            <p> <b>Stable</b> </p>
-                        }
-                    }
-                }
-                } else {
-                    <p> No Vibration data!</p>
-                }
-            </td>
-            <td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
-                <p>#(todayDate.today)</p>
-            </td>
-        </tr>
-        #if(count(temperaturePanel.temperatures) > 0) {
-        <tr>
-            <td rowspan="3" colspan="3" width="88%">
-                <br><br>
+	<br><br>
+	<table width="100%">
+		<tr>
+			<td>
+				<p><u>Main Door</u></p>
+				#if(count(doorStatePanel.doorStates) > 0){
+				#for(doorState in doorStatePanel.doorStates) {
+					#if(isLast){
+						#if(doorState.value > 0){
+							<h3><i class="fas fa-door-open"></i></h3>
+							<p> <b>Opened</b> </p>
+						} else {
+							<h3><i class="fas fa-door-closed"></i></h3>
+							<p> <b>Closed</b> </p>
+						}
+					}
+				}
+				} else {
+					<p> No Door state data!</p>
+				}
+			</td>
+			<td>
+				<p><u>People in Office</u></p>
+				<h3>
+					<i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i>
+				   
+				</h3>
+				<p> <b>4 Pax</b> </p>
+			</td>
+			<td>
+				<p><u>Vibration Sensor</u></p>
+				#if(count(vibrationPanel.vibrations) > 0){
+				#for(vibration in vibrationPanel.vibrations){
+					#if(isLast){
+						#if(vibration.value > 0){
+							<h3><i class="fas fa-exclamation-circle"></i></h3>
+							<p> <b>Slight Movement</b> </p>
+						} else {
+							<h3><i class="fas fa-check-circle"></i></h3>
+							<p> <b>Stable</b> </p>
+						}
+					}
+				}
+				} else {
+					<p> No Vibration data!</p>
+				}
+			</td>
+			<td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
+				<p>#(todayDate.today)</p>
+			</td>
+		</tr>
+		#if(count(temperaturePanel.temperatures) > 0){
+		<tr>
+			<td rowspan="3" colspan="3" width="88%">
+				<br><br>
 				<canvas id="temperature-chart" width="400" height="200"></canvas>
-            </td>
-            <td>
-                <h3><i class="fas fa-thermometer-three-quarters"></i></h3>
-            </td>
-            <td>
-                <div> <u>Max Today</u> </div>
-                <p><b>#(temperaturePanel.max)ºC</b> </p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <h3><i class="fas fa-thermometer-half"></i></h3>
-            </td>
-            <td styletext-align="left">
-                <div> <u>Average Today</u> </div>
-                <p> <b>#(temperaturePanel.average)ºC</b> </p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <h3><i class="fas fa-thermometer-quarter"></i></h3>
-            </td>
-            <td>
-                <div> <u>Min Today</u> </div>
-                <p> <b>#(temperaturePanel.min)ºC</b> </p>
-            </td>
-        </tr>
-        }
-    </table>
-                
-    <br><br>
+			</td>
+			<td>
+				<h3><i class="fas fa-thermometer-three-quarters"></i></h3>
+			</td>
+			<td>
+				<div> <u>Max Today</u> </div>
+				<p><b>#(temperaturePanel.max)ºC</b> </p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h3><i class="fas fa-thermometer-half"></i></h3>
+			</td>
+			<td styletext-align="left">
+				<div> <u>Average Today</u> </div>
+				<p> <b>#(temperaturePanel.average)ºC</b> </p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h3><i class="fas fa-thermometer-quarter"></i></h3>
+			</td>
+			<td>
+				<div> <u>Min Today</u> </div>
+				<p> <b>#(temperaturePanel.min)ºC</b> </p>
+			</td>
+		</tr>
+		}
+	</table>
+	#if(count(humidityPanel.humidities) > 0){
+	<br><br>
+	<canvas id="humidity-chart" width="400" height="200"></canvas>
+	}
+	#if(count(doorStatePanel.doorStates) > 0){
+	<br><br>
+	<canvas id="door-open-chart" width="400" height="200"></canvas>
+	}
+	<br><br>
 	<canvas id="button-press-chart" width="400" height="200"></canvas>
 }
 #embed("base")
