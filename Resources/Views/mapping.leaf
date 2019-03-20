@@ -1,6 +1,6 @@
 #set("mapping-content") {
 <h1>Add New Mapping</h1>
-<form action="/create-mapping" method="POST">
+<form action="/settings/createMap" method="POST">
     <input type="senderId" name="senderId" placeholder="Sender ID" size="40"/>
     <input type="tag" name="tag" placeholder="Tagname" size="40"/>
     <input type="submit" />
@@ -26,7 +26,7 @@
                 <td>#(mapping.senderId)</td>
                 <td>#(mapping.tag)</td>
                 <td>
-                    <form action"/mapping" method="POST">
+                    <form action="/settings/deleteMap" method="POST">
                         <input type="hidden" name="mappingId" value="#(mapping.id)"/>
                     <input type="submit" value="Delete" /></td>
                     </form>
