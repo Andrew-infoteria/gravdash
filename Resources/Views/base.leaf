@@ -28,7 +28,7 @@
 					<a href="/records" class="nav-link">All Records</a>
 				</li>
                 <li class="nav-item #if(title == "Settings"){active}">
-                    <a href="/mapping" class="nav-link">Settings</a>
+                    <a href="/settings" class="nav-link">Settings</a>
                 </li>
 			</ul>
 		</div>

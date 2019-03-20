@@ -1,4 +1,4 @@
-#set("content") {
+#set("mapping-content") {
 <h1>Add New Mapping</h1>
 <form action="/create-mapping" method="POST">
     <input type="senderId" name="senderId" placeholder="Sender ID" size="40"/>
@@ -44,4 +44,4 @@
 
 
 }
-#embed("base")
+#embed("allSettings")

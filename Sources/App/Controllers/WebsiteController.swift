@@ -7,11 +7,6 @@ struct WebsiteController: RouteCollection {
         router.get(use: dashboardHandler)
         router.get("records", Record.parameter, use: recordHandler)
         router.get("records", use: allRecordsHandler)
-        router.get("mapping", use: allMappingsHandler)
-        router.post(Mapping.self, at: "create-mapping", use: createMappingPostHandler)
-        router.post(DeleteRequest.self, at: "mapping") { request, deleteRequest -> Future<Response> in
-            return Mapping.query(on: request).filter(\.id == deleteRequest.mappingId) .first().unwrap(or :Abort(.badRequest)).delete(on: request) .transform(to :request.redirect(to: "mapping"))
-        }
     }
 
     func dashboardHandler(_ req: Request) throws -> Future<View> {
@@ -76,20 +71,7 @@ struct WebsiteController: RouteCollection {
             let context = AllRecordsContext(title: "All Records", records: records)
             return try req.view().render("allRecords", context)
         }
-    }
-    
-    func allMappingsHandler(_ req: Request) throws -> Future<View> {
-        return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
-            let context = AllMappingsContext(title: "Settings", mappings: mappings)
-            return try req.view().render("mapping", context)
-        }
-    }
-
-    func createMappingPostHandler(_ req: Request, mapping: Mapping) throws -> Future<Response> {
-        return mapping.save(on: req).catchMap { error in
-            return mapping
-        }.transform(to: req.redirect(to: "/mapping"))
-    }
+    }=
 }
 
 struct DashboardContext: Encodable {
@@ -142,11 +124,6 @@ struct RecordContext: Encodable {
 struct AllRecordsContext: Encodable {
     let title: String
     let records: [Record]
-}
-
-struct AllMappingsContext: Encodable {
-    let title: String
-    let mappings: [Mapping]
 }
 
 struct DeleteRequest: Content {
