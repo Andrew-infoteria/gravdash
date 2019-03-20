@@ -14,7 +14,7 @@ struct WebsiteController: RouteCollection {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let yesterday = formatter.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
         let threedays = formatter.string(from: Calendar.current.date(byAdding: .day, value: -3, to: Date())!)
-
+       
         let temperatureFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Temperature").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let humidityFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Humidity").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let buttonPressFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
@@ -71,7 +71,7 @@ struct WebsiteController: RouteCollection {
             let context = AllRecordsContext(title: "All Records", records: records)
             return try req.view().render("allRecords", context)
         }
-    }=
+    }
 }
 
 struct DashboardContext: Encodable {
