@@ -21,10 +21,11 @@ struct WebsiteController: RouteCollection {
         let buttonPressFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Button press").filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
         let doorStateFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= week).sort(\.recordTime, .ascending).all()
         let occupancyFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Motion Detected").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let officePeopleFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "NumberOfPeople").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let vibrationFuture: Future<[Record]> = Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();
 
-        return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture) { temperatures, humidities, buttonPresses, doorStates, occupancies in
+        return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture ) { temperatures, humidities, buttonPresses, doorStates, occupancies in
             
             let values = temperatures.map({ Float($0.value)! })
             let min = String(format: "%.2f", values.isEmpty ? 0 : values.min()!)
@@ -41,12 +42,14 @@ struct WebsiteController: RouteCollection {
             context.buttonPressPanel = btnCtx
             context.doorStatePanel = doorCtx
             context.occupancyPanel = occupCtx
+            
             return context
         }.flatMap(to: DashboardContext.self) { dashboard in
             var context = dashboard
-            return map(vibrationFuture, mappingFuture) {vibrations, mappings in
-                
+            return map(officePeopleFuture, vibrationFuture, mappingFuture) {officePeople, vibrations, mappings in
+                let offPplCtx = OfficePeoplePanelContext(officePeople: officePeople)
                 let vibrateCtx = VibrationPanelContext(vibrations: vibrations)
+                context.officePeoplePanel = offPplCtx
                 context.vibrationPanel = vibrateCtx
                 context.mappings = mappings
                 
@@ -89,6 +92,7 @@ struct DashboardContext: Encodable {
     var buttonPressPanel: ButtonPressPanelContext? = nil
     var doorStatePanel: DoorStatePanelContext? = nil
     var occupancyPanel: OccupancyPanelContext? = nil
+    var officePeoplePanel: OfficePeoplePanelContext? = nil
     var vibrationPanel: VibrationPanelContext? = nil
     var mappings: [Mapping]? = nil
 
@@ -122,6 +126,10 @@ struct DoorStatePanelContext: Encodable {
 
 struct OccupancyPanelContext: Encodable {
     let occupancies: [Record]
+}
+
+struct OfficePeoplePanelContext: Encodable {
+    let officePeople: [Record]
 }
 
 struct VibrationPanelContext: Encodable {
