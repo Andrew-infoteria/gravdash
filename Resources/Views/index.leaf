@@ -98,7 +98,7 @@ function addDataToDataset(data, datasets, name) {
                 }
             </td>
             <td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
-                <p>28 Feb</p>
+                <p>#(todayDate.today)</p>
             </td>
         </tr>
         #if(count(temperaturePanel.temperatures) > 0) {

@@ -23,8 +23,7 @@ struct SettingsController: RouteCollection {
     func allMappingsHandler(_ req: Request) throws -> Future<View> {
         let displayFormatter = DateFormatter()
         displayFormatter.dateFormat = "dd MMM"
-        let now = Date()
-        let today = displayFormatter.string(from :now)
+        let today = displayFormatter.string(from :Date())
         return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
             let context = AllMappingsContext(title: "Mapping Settings", mappings: mappings, today: today)
             return try req.view().render("mapping", context)
