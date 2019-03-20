@@ -75,9 +75,17 @@ function addDataToDataset(data, datasets, name) {
                 <p><u>People in Office</u></p>
                 <h3>
                     <i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i><i class="fas fa-user"></i>
-                   
                 </h3>
-                <p> <b>4 Pax</b> </p>
+                #if(count(vibrationPanel.vibrations) > 0){
+                #for(pax in officePeoplePanel.officePeople){
+                    #if(isLast){
+                        <p> <b>#(pax.value) Pax</b> </p>
+                    }
+                }
+                } else {
+                <p> No Number of People data!</p>
+                }
+                
             </td>
             <td>
                 <p><u>Vibration Sensor</u></p>
