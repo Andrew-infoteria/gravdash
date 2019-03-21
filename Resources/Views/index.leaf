@@ -119,12 +119,23 @@ function addDataToDataset(data, datasets, name) {
                 #if(count(vibrationPanel.vibrations) > 0){
                 #for(vibration in vibrationPanel.vibrations){
                     #if(isLast){
-                        #if(vibration.value > 0){
-                            <h3><i class="fas fa-exclamation-circle"></i></h3>
-                            <p> <b>Slight Movement</b> </p>
-                        } else {
+                        #if(vibration.value == 0){
                             <h3><i class="fas fa-check-circle"></i></h3>
                             <p> <b>Stable</b> </p>
+                        } else {
+                            #if(vibration.value == 1){
+                            <h3><i class="fas fa-exclamation-circle"></i></h3>
+                            <p> <b>Slight Movement</b> </p>
+                            } else {
+                                #if(vibration.value == 3){
+                                <h3><i class="fas fa-minus-circle"></i></h3>
+                                <p> <b>Falling!</b> </p>
+                                } else {
+                                <h3><i class="fas fa-adjust"></i></h3>
+                                <p> <b>Tilted #(vibration.value)º</b> </p>
+                                } else {
+                                }
+                            }
                         }
                     }
                 }
