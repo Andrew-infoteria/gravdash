@@ -1,7 +1,6 @@
 #set("content") {
 
 <p> More settings here. </p>
-<p> Date Today: #(today) </p>
 <br><br>
 
 #get(mapping-content)

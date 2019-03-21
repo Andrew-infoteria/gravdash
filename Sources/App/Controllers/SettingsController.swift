@@ -4,8 +4,15 @@ import FluentPostgreSQL
 
 struct AllMappingsContext: Encodable {
     let title: String
-    let mappings: [Mapping]
-    let today: String
+    var mappings: [Mapping]? = nil
+    var senderIdsPanel: SenderIdPanelContext? = nil
+    init(title: String) {
+        self.title = title
+    }
+}
+
+struct SenderIdPanelContext: Encodable {
+    let senderIds: [Record]
 }
 
 struct DeleteMappingRequest :Content {
@@ -21,11 +28,18 @@ struct SettingsController: RouteCollection {
     }
     
     func allMappingsHandler(_ req: Request) throws -> Future<View> {
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "dd MMM"
-        let today = displayFormatter.string(from :Date())
-        return Mapping.query(on: req).all().flatMap(to: View.self) { mappings in
-            let context = AllMappingsContext(title: "Mapping Settings", mappings: mappings, today: today)
+       let distinctSenderId = req.withPooledConnection(to: .psql) { (conn) -> Future<[Record]> in
+            conn.raw("SELECT DISTINCT ON(\"senderId\") * FROM \"Record\"")
+                .all(decoding: Record.self)
+        }
+        let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();
+        return map(to: AllMappingsContext.self, distinctSenderId, mappingFuture) { senderIds, mappings in
+            let senderIdsCtx = SenderIdPanelContext(senderIds: senderIds)
+            var context = AllMappingsContext(title: "Settings")
+            context.senderIdsPanel = senderIdsCtx
+            context.mappings = mappings
+            return context
+        }.flatMap(to: View.self) { context in
             return try req.view().render("mapping", context)
         }
     }
