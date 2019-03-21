@@ -11,15 +11,17 @@ window.onload = function () {
 	var tDatasets = [];
 	#for(record in temperaturePanel.temperatures) {
 		var senderId = "#(record.senderId)";
+		var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		addDataToDataset(data, tDatasets, mappings[senderId]);
+		addDataToDataset(data, tDatasets, label);
 	}
 	loadTemperatureChart(tDatasets);
 	var hDatasets = [];
 	#for(record in humidityPanel.humidities) {
 		var senderId = "#(record.senderId)";
+		var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
 		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		addDataToDataset(data, hDatasets, mappings[senderId]);
+		addDataToDataset(data, hDatasets, label);
 	}
 	loadHumidityChart(hDatasets);
 	var doorStates = [];
