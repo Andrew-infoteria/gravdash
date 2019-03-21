@@ -22,10 +22,10 @@ struct WebsiteController: RouteCollection {
         let doorStateFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Door state").filter(\.recordTime >= week).sort(\.recordTime, .ascending).all()
         let occupancyFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Motion Detected").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let officePeopleFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "NumberOfPeople").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
-        let vibrationFuture: Future<[Record]> = Record.query(on: req).filter(\.senderId == "A7-24-A2-02-00-8D-15-00").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
+        let vibrationFuture: Future<[Record]> = Record.query(on: req).group(.or) { $0.filter(\.type == "Ready").filter(\.type == "Tilt").filter(\.type == "Drop") }.filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
         let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();
 
-        return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture ) { temperatures, humidities, buttonPresses, doorStates, occupancies in
+        return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture) { temperatures, humidities, buttonPresses, doorStates, occupancies in
             
             let values = temperatures.map({ Float($0.value)! })
             let min = String(format: "%.2f", values.isEmpty ? 0 : values.min()!)
