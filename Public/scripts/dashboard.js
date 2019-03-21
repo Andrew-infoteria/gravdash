@@ -237,6 +237,64 @@ function loadButtonPressChart (datasets, bound) {
 	});
 }
 
+function loadVibrationChart (datasets) {
+	var ctx = document.getElementById("vibration-chart");
+	var barColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+	var chartDatasets = []
+	for (var key in datasets) {
+		var chartDataset = {
+			label: key,
+			backgroundColor: barColors.shift(),
+			fill: false,
+			data: datasets[key]
+		}
+		chartDatasets.push(chartDataset)
+	}
+	console.log(chartDatasets);
+	var myBarChart = new Chart(ctx, {
+		type: 'scatter',
+		data: {
+			datasets: chartDatasets
+		},
+		options: {
+			title: {
+				display: true,
+				fontSize: 20,
+				text: 'Vibration(Tilt)'
+			},
+			legend: {
+				position: 'bottom'
+			},
+			tooltips: {
+				titleFontSize: 14,
+				bodyFontSize: 14,
+				callbacks: {
+					title: function(tooltipItems, data) {
+						var datetime = tooltipItems[0].xLabel;
+						return datetime.substring(0, datetime.indexOf('.'));
+					},
+					label: function(tooltipItem, data) {
+						return ' ' + Math.round(tooltipItem.yLabel * 100) / 100 + 'º';
+					}
+				}
+			},
+			scales: {
+				xAxes: [{
+					type: 'time',
+				}],
+				yAxes: [{
+					type: 'linear',
+					scaleLabel: {
+						display: true,
+						labelString: 'Angel',
+						fontSize: 20
+					}
+				}],
+			}
+		}
+	});
+}
+
 function getYAverage(records) {
 	var total = 0;
 	for(var i = 0; i < records.length; i++) {

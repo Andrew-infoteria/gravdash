@@ -66,6 +66,17 @@ window.onload = function () {
 	lastDate.setDate(lastDate.getDate() + 1);
 	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
 	loadButtonPressChart(bpDatasets, addBound);
+	// vibration tilt chart
+	var vDatasets = [];
+	#for(record in vibrationPanel.vibrations) {
+		#if(record.type == "Tilt") {
+			var senderId = "#(record.senderId)";
+			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
+			var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
+			addDataToDataset(data, vDatasets, label);
+		}
+	}
+	loadVibrationChart(vDatasets)
 \}
 function addDataToDataset(data, datasets, name) {
 	if (!datasets.hasOwnProperty(name)) {
@@ -172,5 +183,9 @@ function addDataToDataset(data, datasets, name) {
 	}
 	<br><br>
 	<canvas id="button-press-chart" width="400" height="200"></canvas>
+	#if(count(vibrationPanel.vibrations) > 0){
+	<br><br>
+	<canvas id="vibration-chart" width="400" height="200"></canvas>
+	}
 }
 #embed("base")
