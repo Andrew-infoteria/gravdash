@@ -1,29 +1,23 @@
 #set("script") {
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 <script src="/scripts/utils.js"></script>
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
+window.charts = {\};
+var mappings = [];
+#for(mapping in mappings) {
+	mappings["#(mapping.senderId)"] = "#(mapping.tag)";
+}
 window.onload = function () {
-	var mappings = [];
-	#for(mapping in mappings) {
-		mappings["#(mapping.senderId)"] = "#(mapping.tag)";
-	}
-	var tDatasets = [];
-	#for(record in temperaturePanel.temperatures) {
-		var senderId = "#(record.senderId)";
-		var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		addDataToDataset(data, tDatasets, label);
-	}
-	loadTemperatureChart(tDatasets);
-	var hDatasets = [];
-	#for(record in humidityPanel.humidities) {
-		var senderId = "#(record.senderId)";
-		var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-		var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-		addDataToDataset(data, hDatasets, label);
-	}
-	loadHumidityChart(hDatasets);
+	prepareTemperatureChart();
+	prepareHumidityChart();
+	updateTemperaturePanel();
+	updateHumidityPanel();
+	$('#humidity-panel-range').change(function() {
+		updateTemperaturePanel();
+		updateHumidityPanel();
+	\});
 	var doorStates = [];
 	#for(record in doorStatePanel.doorStates) {
 		doorStates.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
@@ -79,6 +73,66 @@ window.onload = function () {
 		}
 	}
 	loadVibrationChart(vDatasets)
+\}
+function updateTemperaturePanel() {
+	var chart = window.charts.temperature;
+	if (!chart) return;
+	var element = document.getElementById("humidity-panel-range");
+	var range = element.options[element.selectedIndex].value.split('/');
+	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
+	getChartData('/api/records?type=Temperature&from=' + from, function(records) {
+		var tDatasets = [];
+		for (var i = 0; i < records.length; i++) {
+			var senderId = records[i].senderId;
+			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
+			var data = {x: new Date(records[i].recordTime), y: records[i].value\};
+			addDataToDataset(data, tDatasets, label);
+		\}
+		var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+		var chartDatasets = [];
+		for (var key in tDatasets) {
+			var chartDataset = {
+				label: key,
+				borderColor: lineColors.shift(),
+				data: tDatasets[key],
+				lineTension: 0,
+				fill: false
+			\}
+			chartDatasets.push(chartDataset)
+		\}
+		chart.data.datasets = chartDatasets;
+		chart.update();
+	\});
+\}
+function updateHumidityPanel() {
+	var chart = window.charts.humidity;
+	if (!chart) return;
+	var element = document.getElementById("humidity-panel-range");
+	var range = element.options[element.selectedIndex].value.split('/');
+	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
+	getChartData('/api/records?type=Humidity&from=' + from, function(records) {
+		var hDatasets = [];
+		for (var i = 0; i < records.length; i++) {
+			var senderId = records[i].senderId;
+			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
+			var data = {x: new Date(records[i].recordTime), y: records[i].value\};
+			addDataToDataset(data, hDatasets, label);
+		\}
+		var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+		var chartDatasets = [];
+		for (var key in hDatasets) {
+			var chartDataset = {
+				label: key,
+				borderColor: lineColors.shift(),
+				data: hDatasets[key],
+				lineTension: 0,
+				fill: false
+			\}
+			chartDatasets.push(chartDataset)
+		\}
+		chart.data.datasets = chartDatasets;
+		chart.update();
+	\});
 \}
 function addDataToDataset(data, datasets, name) {
 	if (!datasets.hasOwnProperty(name)) {
@@ -164,7 +218,7 @@ function addDataToDataset(data, datasets, name) {
         <tr>
             <td rowspan="3" colspan="3" width="88%">
                 <br><br>
-				<canvas id="temperature-chart" width="400" height="200"></canvas>
+				<canvas id="temperature-chart" width="400" height="200" data-url="/api/records?type=Temperature"></canvas>
 			</td>
 			<td>
 				<h3><i class="fas fa-thermometer-three-quarters"></i></h3>
@@ -197,6 +251,14 @@ function addDataToDataset(data, datasets, name) {
 	#if(count(humidityPanel.humidities) > 0){
 	<br><br>
 	<canvas id="humidity-chart" width="400" height="200"></canvas>
+	<label>Range:</label>
+	<select id="humidity-panel-range">
+		<option value="1/days">Today</option>
+		<option value="2/days">Yesterday</option>
+		<option value="3/days">Three days</option>>
+		<option value="1/weeks">This week</option>
+		<option value="1/years">This month</option>
+	</select>
 	}
 	#if(count(doorStatePanel.doorStates) > 0){
 	<br><br>

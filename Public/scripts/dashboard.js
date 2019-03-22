@@ -1,19 +1,9 @@
-function loadTemperatureChart (datasets) {
+function prepareTemperatureChart () {
 	var ctx = document.getElementById("temperature-chart");
 	if (!ctx) return;
 	var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
 	var chartDatasets = [];
-	for (var key in datasets) {
-		var chartDataset = {
-			label: key,
-			borderColor: lineColors.shift(),
-			data: datasets[key],
-			lineTension: 0,
-			fill: false
-		}
-		chartDatasets.push(chartDataset)
-	}
-	var myLineChart = new Chart(ctx, {
+	window.charts.temperature = new Chart(ctx, {
 		type: 'line',
 		data: {
 			datasets: chartDatasets
@@ -58,6 +48,65 @@ function loadTemperatureChart (datasets) {
 					scaleLabel: {
 						display: true,
 						labelString: 'Degrees Celcius',
+						fontSize: 20
+					}
+				}]
+			}
+		}
+	});
+}
+
+function prepareHumidityChart () {
+	var ctx = document.getElementById("humidity-chart");
+	if (!ctx) return;
+	var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
+	var chartDatasets = [];
+	window.charts.humidity = new Chart(ctx, {
+		type: 'line',
+		data: {
+			datasets: chartDatasets
+		},
+		options: {
+			title: {
+				display: true,
+				fontSize: 20,
+				text: 'Humidity'
+			},
+			legend: {
+				position: 'bottom'
+			},
+			tooltips: {
+				mode: 'index',
+				intersect: false,
+				titleFontSize: 14,
+				bodyFontSize: 14,
+				callbacks: {
+					title: function(tooltipItems, data) {
+						var datetime = tooltipItems[0].xLabel;
+						return datetime.substring(0, datetime.indexOf('.'));
+					},
+					label: function(tooltipItem, data) {
+						return ' ' + Math.round(tooltipItem.yLabel * 100) / 100 + ' %';
+					}
+				}
+			},
+			hover: {
+				mode: 'nearest',
+				intersect: true
+			},
+			scales: {
+				xAxes: [{
+					type: 'time'
+				}],
+				yAxes: [{
+					type: 'linear',
+					ticks: {
+						suggestedMin: 0,
+						suggestedMax: 100
+					},
+					scaleLabel: {
+						display: true,
+						labelString: 'Relative Humidity',
 						fontSize: 20
 					}
 				}]
@@ -250,7 +299,6 @@ function loadVibrationChart (datasets) {
 		}
 		chartDatasets.push(chartDataset)
 	}
-	console.log(chartDatasets);
 	var myBarChart = new Chart(ctx, {
 		type: 'scatter',
 		data: {
@@ -295,10 +343,13 @@ function loadVibrationChart (datasets) {
 	});
 }
 
-function getYAverage(records) {
-	var total = 0;
-	for(var i = 0; i < records.length; i++) {
-		total += records[i].y;
-	}
-	return total / records.length;
-}
+var getChartData = function (url, callback) {
+	$.ajax({
+		url: url,
+		method: 'GET',
+		dataType: 'json',
+		success: function (data) {
+			callback(data);
+		}
+	});
+};
