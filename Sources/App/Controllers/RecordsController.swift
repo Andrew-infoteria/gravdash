@@ -18,6 +18,9 @@ struct RecordsController: RouteCollection {
 
     func getAllHandler(_ req: Request) throws -> Future<[Record]> {
         var builder = Record.query(on: req)
+        if let type = req.query[String.self, at: "type"] {
+            builder = builder.filter(\.type == type)
+        }
         if let from = req.query[String.self, at: "from"] {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
