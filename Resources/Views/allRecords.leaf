@@ -18,11 +18,12 @@ jQuery(document).ready(function($) {
 			{ "data": "value" \},
 			{ "data": "recordTime" \},
 			{ "data": "recordTime", "render": function ( data, type, row, meta ) {
-				return moment(new Date(data)).format('dddd, DD MMMM YYYY, h:mm a');;
-		    \}\}
+				return moment(new Date(data)).format('dddd, DD MMMM YYYY, h:mm a');
+			\}\}
 		],
 		"lengthMenu": [ [10, 20, 50, -1], [10, 20, 50, "All"] ],
 		"order": [[ 5, "desc" ]],
+		"autoWidth": false,
 		"columnDefs": [
 			{ "className": " text-left", "orderable": false, "targets": [0,1,2,3,4,5,6] \},
 			{ "visible": false, "targets": [0,5] \},
