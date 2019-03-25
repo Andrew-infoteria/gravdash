@@ -91,6 +91,11 @@ function updateTemperaturePanel() {
 		}
 		chart.data.datasets = chartDatasets;
 		chart.update();
+		var temperatures = records.reduce(function (a, r) { a.push(parseFloat(r.value)); return a; }, []);
+		document.getElementById("max-temp").innerText = Math.max(...temperatures) + 'ºC';
+		document.getElementById("min-temp").innerText = Math.min(...temperatures) + 'ºC';
+		if (temperatures.length)
+			document.getElementById("avg-temp").innerText = temperatures.reduce(function(a, b) { return a + b; }) / temperatures.length;
 	});
 }
 

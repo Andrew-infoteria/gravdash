@@ -114,8 +114,8 @@ window.onload = function () {
 				<h3><i class="fas fa-thermometer-three-quarters"></i></h3>
 			</td>
 			<td>
-				<div> <u>Max Today</u> </div>
-				<p><b>#(temperaturePanel.max)ºC</b> </p>
+				<div><u>Max Today</u></div>
+				<p><b id="max-temp"></b></p>
 			</td>
 		</tr>
 		<tr>
@@ -123,8 +123,8 @@ window.onload = function () {
 				<h3><i class="fas fa-thermometer-half"></i></h3>
 			</td>
 			<td styletext-align="left">
-				<div> <u>Average Today</u> </div>
-				<p> <b>#(temperaturePanel.average)ºC</b> </p>
+				<div><u>Average Today</u></div>
+				<p><b id="avg-temp"></b></p>
 			</td>
 		</tr>
 		<tr>
@@ -132,8 +132,8 @@ window.onload = function () {
 				<h3><i class="fas fa-thermometer-quarter"></i></h3>
 			</td>
 			<td>
-				<div> <u>Min Today</u> </div>
-				<p> <b>#(temperaturePanel.min)ºC</b> </p>
+				<div><u>Min Today</u></div>
+				<p><b id="min-temp"></b></p>
 			</td>
 		</tr>
 		}
