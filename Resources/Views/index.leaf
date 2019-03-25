@@ -12,212 +12,102 @@ var mappings = [];
 window.onload = function () {
 	prepareTemperatureChart();
 	prepareHumidityChart();
-	updateTemperaturePanel();
-	updateHumidityPanel();
-	$('#humidity-panel-range').change(function() {
-		updateTemperaturePanel();
-		updateHumidityPanel();
+	prepareDoorOpenChart();
+	prepareVibrationChart();
+	prepareButtonPressChart();
+	updatePanels();
+	$("#dashboard-range").change(function() {
+		updatePanels();
 	\});
-	var doorStates = [];
-	#for(record in doorStatePanel.doorStates) {
-		doorStates.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
-	}
-	var datas = [];
-	for (var i = 0; i < doorStates.length; i++) {
-		var record = doorStates[i];
-		addDataToDataset(record, datas, record.recordTime.substring(0,10));
-	\}
-	var dDatasets = [];
-	dDatasets['Open'] = [];
-	for (var key in datas) {
-		dDatasets['Open'].push({x: key, y: datas[key].filter(record => record.value == 1).length\});
-	\}
-	var firstDate = new Date(doorStates.reduce((min, r) => r.recordTime < min ? r.recordTime : min, doorStates[0].recordTime));
-	var lastDate = new Date(doorStates.reduce((max, r) => r.recordTime > max ? r.recordTime : max, doorStates[0].recordTime));
-	firstDate.setDate(firstDate.getDate() - 1);
-	lastDate.setDate(lastDate.getDate() + 1);
-	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
-	loadDoorOpenChart(dDatasets, addBound);
-	var buttonPresses = [];
-	#for(record in buttonPressPanel.buttonPresses) {
-		buttonPresses.push({value: '#(record.value)', recordTime: '#(record.recordTime)'\});
-	}
-	var datas = [];
-	for (var i = 0; i < buttonPresses.length; i++) {
-		var record = buttonPresses[i];
-		addDataToDataset(record, datas, record.recordTime.substring(0,10));
-	\}
-	var bpDatasets = [];
-	bpDatasets['Single Press'] = [];
-	bpDatasets['Double Press'] = [];
-	bpDatasets['Long Press'] = [];
-	for (var key in datas) {
-		bpDatasets['Single Press'].push({x: key, y: datas[key].filter(record => record.value == 1).length\});
-		bpDatasets['Double Press'].push({x: key, y: datas[key].filter(record => record.value == 2).length\});
-		bpDatasets['Long Press'].push({x: key, y: datas[key].filter(record => record.value == 255).length\});
-	\}
-	var firstDate = new Date(buttonPresses.reduce((min, r) => r.recordTime < min ? r.recordTime : min, buttonPresses[0].recordTime));
-	var lastDate = new Date(buttonPresses.reduce((max, r) => r.recordTime > max ? r.recordTime : max, buttonPresses[0].recordTime));
-	firstDate.setDate(firstDate.getDate() - 1);
-	lastDate.setDate(lastDate.getDate() + 1);
-	var addBound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
-	loadButtonPressChart(bpDatasets, addBound);
-	// vibration tilt chart
-	var vDatasets = [];
-	#for(record in vibrationPanel.vibrations) {
-		#if(record.type == "Tilt") {
-			var senderId = "#(record.senderId)";
-			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-			var data = {x: new Date("#(record.recordTime)"), y: #(record.value)\}
-			addDataToDataset(data, vDatasets, label);
-		}
-	}
-	loadVibrationChart(vDatasets)
-\}
-function updateTemperaturePanel() {
-	var chart = window.charts.temperature;
-	if (!chart) return;
-	var element = document.getElementById("humidity-panel-range");
-	var range = element.options[element.selectedIndex].value.split('/');
-	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Temperature&from=' + from, function(records) {
-		var tDatasets = [];
-		for (var i = 0; i < records.length; i++) {
-			var senderId = records[i].senderId;
-			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-			var data = {x: new Date(records[i].recordTime), y: records[i].value\};
-			addDataToDataset(data, tDatasets, label);
-		\}
-		var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
-		var chartDatasets = [];
-		for (var key in tDatasets) {
-			var chartDataset = {
-				label: key,
-				borderColor: lineColors.shift(),
-				data: tDatasets[key],
-				lineTension: 0,
-				fill: false
-			\}
-			chartDatasets.push(chartDataset)
-		\}
-		chart.data.datasets = chartDatasets;
-		chart.update();
-	\});
-\}
-function updateHumidityPanel() {
-	var chart = window.charts.humidity;
-	if (!chart) return;
-	var element = document.getElementById("humidity-panel-range");
-	var range = element.options[element.selectedIndex].value.split('/');
-	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Humidity&from=' + from, function(records) {
-		var hDatasets = [];
-		for (var i = 0; i < records.length; i++) {
-			var senderId = records[i].senderId;
-			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-			var data = {x: new Date(records[i].recordTime), y: records[i].value\};
-			addDataToDataset(data, hDatasets, label);
-		\}
-		var lineColors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
-		var chartDatasets = [];
-		for (var key in hDatasets) {
-			var chartDataset = {
-				label: key,
-				borderColor: lineColors.shift(),
-				data: hDatasets[key],
-				lineTension: 0,
-				fill: false
-			\}
-			chartDatasets.push(chartDataset)
-		\}
-		chart.data.datasets = chartDatasets;
-		chart.update();
-	\});
-\}
-function addDataToDataset(data, datasets, name) {
-	if (!datasets.hasOwnProperty(name)) {
-		datasets[name] = [];
-	\}
-	datasets[name].push(data);
 \}
 </script>
 }
 #set("content") {
-	<h1>Dashboard</h1>
-    <br><br>
-    <table width="100%">
-        <tr>
-            <td>
-                <p><u>Main Door</u></p>
-                #if(count(doorStatePanel.doorStates) > 0){
-                #for(doorState in doorStatePanel.doorStates) {
-                    #if(isLast){
-                        #if(doorState.value > 0){
-                            <h3><i class="fas fa-door-open"></i></h3>
-                            <p> <b>Opened</b> </p>
-                        } else {
-                            <h3><i class="fas fa-door-closed"></i></h3>
-                            <p> <b>Closed</b> </p>
-                        }
-                    }
-                }
-                } else {
-                    <p> No Door state data!</p>
-                }
-            </td>
-            <td>
-                <p><u>People in Office</u></p>
-                <h3>
-                    <i class="fas fa-users"></i>
-                </h3>
-                #if(count(officePeoplePanel.officePeople) > 0){
-                #for(pax in officePeoplePanel.officePeople){
-                    #if(isLast){
-                        <p> <b>#(pax.value) Pax</b> </p>
-                    }
-                }
-                } else {
-                <p> No Number of People data!</p>
-                }
-                
-            </td>
-            <td>
-                <p><u>Vibration Sensor</u></p>
-                #if(count(vibrationPanel.vibrations) > 0){
-                #for(vibration in vibrationPanel.vibrations){
-                    #if(isLast){
-                        #if(vibration.value == 0){
-                            <h3><i class="fas fa-check-circle"></i></h3>
-                            <p> <b>Stable</b> </p>
-                        } else {
-                            #if(vibration.value == 1){
-                            <h3><i class="fas fa-exclamation-circle"></i></h3>
-                            <p> <b>Slight Movement</b> </p>
-                            } else {
-                                #if(vibration.value == 3){
-                                <h3><i class="fas fa-minus-circle"></i></h3>
-                                <p> <b>Falling!</b> </p>
-                                } else {
-                                <h3><i class="fas fa-adjust"></i></h3>
-                                <p> <b>Tilted #(vibration.value)º</b> </p>
-                                } else {
-                                }
-                            }
-                        }
-                    }
-                }
-                } else {
-                    <p> No Vibration data!</p>
-                }
-            </td>
-            <td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
-                <p>#(todayDate.today)</p>
-            </td>
-        </tr>
-        #if(count(temperaturePanel.temperatures) > 0) {
-        <tr>
-            <td rowspan="3" colspan="3" width="88%">
-                <br><br>
+	<div class="" style="position: relative;">
+		<h1>Dashboard</h1>
+		<label>Range:</label>
+		<select id="dashboard-range">
+			<option value="1/days">Today</option>
+			<option value="2/days">Yesterday</option>
+			<option value="3/days">Three days</option>>
+			<option value="1/weeks">This week</option>
+			<option value="1/years">This month</option>
+		</select>
+	</div>
+	<br><br>
+	<table width="100%">
+		<tr>
+			<td>
+				<p><u>Main Door</u></p>
+				#if(count(doorStatePanel.doorStates) > 0){
+				#for(doorState in doorStatePanel.doorStates) {
+					#if(isLast){
+						#if(doorState.value > 0){
+							<h3><i class="fas fa-door-open"></i></h3>
+							<p> <b>Opened</b> </p>
+						} else {
+							<h3><i class="fas fa-door-closed"></i></h3>
+							<p> <b>Closed</b> </p>
+						}
+					}
+				}
+				} else {
+					<p> No Door state data!</p>
+				}
+			</td>
+			<td>
+				<p><u>People in Office</u></p>
+				<h3>
+					<i class="fas fa-users"></i>
+				</h3>
+				#if(count(officePeoplePanel.officePeople) > 0){
+				#for(pax in officePeoplePanel.officePeople){
+					#if(isLast){
+						<p> <b>#(pax.value) Pax</b> </p>
+					}
+				}
+				} else {
+				<p> No Number of People data!</p>
+				}
+				
+			</td>
+			<td>
+				<p><u>Vibration Sensor</u></p>
+				#if(count(vibrationPanel.vibrations) > 0){
+				#for(vibration in vibrationPanel.vibrations){
+					#if(isLast){
+						#if(vibration.value == 0){
+							<h3><i class="fas fa-check-circle"></i></h3>
+							<p> <b>Stable</b> </p>
+						} else {
+							#if(vibration.value == 1){
+							<h3><i class="fas fa-exclamation-circle"></i></h3>
+							<p> <b>Slight Movement</b> </p>
+							} else {
+								#if(vibration.value == 3){
+								<h3><i class="fas fa-minus-circle"></i></h3>
+								<p> <b>Falling!</b> </p>
+								} else {
+								<h3><i class="fas fa-adjust"></i></h3>
+								<p> <b>Tilted #(vibration.value)º</b> </p>
+								} else {
+								}
+							}
+						}
+					}
+				}
+				} else {
+					<p> No Vibration data!</p>
+				}
+			</td>
+			<td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
+				<p>#(todayDate.today)</p>
+			</td>
+		</tr>
+		#if(count(temperaturePanel.temperatures) > 0) {
+		<tr>
+			<td rowspan="3" colspan="3" width="88%">
+				<br><br>
 				<canvas id="temperature-chart" width="400" height="200" data-url="/api/records?type=Temperature"></canvas>
 			</td>
 			<td>
@@ -251,14 +141,6 @@ function addDataToDataset(data, datasets, name) {
 	#if(count(humidityPanel.humidities) > 0){
 	<br><br>
 	<canvas id="humidity-chart" width="400" height="200"></canvas>
-	<label>Range:</label>
-	<select id="humidity-panel-range">
-		<option value="1/days">Today</option>
-		<option value="2/days">Yesterday</option>
-		<option value="3/days">Three days</option>>
-		<option value="1/weeks">This week</option>
-		<option value="1/years">This month</option>
-	</select>
 	}
 	#if(count(doorStatePanel.doorStates) > 0){
 	<br><br>
