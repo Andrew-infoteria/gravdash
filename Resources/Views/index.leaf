@@ -19,6 +19,7 @@ window.onload = function () {
 	$("#dashboard-range").change(function() {
 		updatePanels();
 	\});
+	setInterval(autoUpdatePanels, 30000);
 \}
 </script>
 }

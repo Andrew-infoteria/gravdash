@@ -6,6 +6,14 @@ function updatePanels() {
 	updateVibrationPanel();
 }
 
+function autoUpdatePanels() {
+	updateTemperaturePanel(false);
+	updateHumidityPanel(false);
+	updateDoorPanel(false);
+	updateButtonPressPanel(false);
+	updateVibrationPanel(false);
+}
+
 // Temperature
 function prepareTemperatureChart() {
 	var ctx = document.getElementById("temperature-chart");
@@ -63,7 +71,7 @@ function prepareTemperatureChart() {
 	});
 }
 
-function updateTemperaturePanel() {
+function updateTemperaturePanel(animate = true) {
 	var chart = window.charts.temperature;
 	if (!chart) return;
 	var element = document.getElementById("dashboard-range");
@@ -90,6 +98,7 @@ function updateTemperaturePanel() {
 			chartDatasets.push(chartDataset)
 		}
 		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
 		var temperatures = records.reduce(function (a, r) { a.push(parseFloat(r.value)); return a; }, []);
 		var max = Math.max(...temperatures);
@@ -161,7 +170,7 @@ function prepareHumidityChart() {
 	});
 }
 
-function updateHumidityPanel() {
+function updateHumidityPanel(animate = true) {
 	var chart = window.charts.humidity;
 	if (!chart) return;
 	var element = document.getElementById("dashboard-range");
@@ -188,6 +197,7 @@ function updateHumidityPanel() {
 			chartDatasets.push(chartDataset)
 		}
 		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
 	});
 }
@@ -234,7 +244,7 @@ function prepareDoorOpenChart() {
 	});
 }
 
-function updateDoorPanel() {
+function updateDoorPanel(animate = true) {
 	var chart = window.charts.doorOpen;
 	if (!chart) return;
 	var element = document.getElementById("dashboard-range");
@@ -270,6 +280,7 @@ function updateDoorPanel() {
 		var bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
 		chart.data.labels = bound;
 		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
 	});
 }
@@ -316,7 +327,7 @@ function prepareButtonPressChart() {
 	});
 }
 
-function updateButtonPressPanel() {
+function updateButtonPressPanel(animate = true) {
 	var chart = window.charts.buttonPress;
 	if (!chart) return;
 	var element = document.getElementById("dashboard-range");
@@ -352,6 +363,7 @@ function updateButtonPressPanel() {
 		var bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
 		chart.data.labels = bound;
 		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
 	});	
 }
@@ -408,7 +420,7 @@ function prepareVibrationChart() {
 	});
 }
 
-function updateVibrationPanel() {
+function updateVibrationPanel(animate = true) {
 	var chart = window.charts.vibration;
 	if (!chart) return;
 	var element = document.getElementById("dashboard-range");
@@ -434,6 +446,7 @@ function updateVibrationPanel() {
 			chartDatasets.push(chartDataset)
 		}
 		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
 	});
 }
