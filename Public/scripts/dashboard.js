@@ -33,7 +33,7 @@ function prepareTemperatureChart() {
 				position: 'bottom'
 			},
 			tooltips: {
-				mode: 'index',
+				mode: 'nearest',
 				intersect: false,
 				titleFontSize: 14,
 				bodyFontSize: 14,
@@ -46,10 +46,6 @@ function prepareTemperatureChart() {
 						return ' ' + Math.round(tooltipItem.yLabel * 100) / 100 + ' ºC';
 					}
 				}
-			},
-			hover: {
-				mode: 'nearest',
-				intersect: true
 			},
 			scales: {
 				xAxes: [{
@@ -131,7 +127,7 @@ function prepareHumidityChart() {
 				position: 'bottom'
 			},
 			tooltips: {
-				mode: 'index',
+				mode: 'nearest',
 				intersect: false,
 				titleFontSize: 14,
 				bodyFontSize: 14,
@@ -144,10 +140,6 @@ function prepareHumidityChart() {
 						return ' ' + Math.round(tooltipItem.yLabel * 100) / 100 + ' %';
 					}
 				}
-			},
-			hover: {
-				mode: 'nearest',
-				intersect: true
 			},
 			scales: {
 				xAxes: [{
