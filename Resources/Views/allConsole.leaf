@@ -3,15 +3,14 @@
 <p> Buttons and Controls here. </p>
 <br><br>
 
-<form action="/console/mpush" method="get">
-Microbot push button: <input type="submit" value="Push"/>
+<form action="/console/gpull" method="get">
+<u>Gravio App API puller</u> <br>
+IP Address: <input type="ipAdd" name="ipAdd" placeholder=" e.g. 192.168.49.16" size="40"/> <br>
+Layer Name: <input type="layerName" name="layerName" placeholder=" e.g. Wireless Switch" size="40"/> <br>
+<input type="submit" value="Pull"/>
 </form>
 
-<br><br>
 
-<form action="/console" method="get">
-<p>Enter text to display on LED: <input type="ledInput" name="ledInput" placeholder=" Write something here." size="40"/> <input type="submit" value="Send"/>
-</form>
 
 }
 #embed("base")

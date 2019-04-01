@@ -12,27 +12,37 @@ struct AllConsoleContext: Encodable {
     }
 }
 
-struct LoginRequest: Content {
-    var cod: String
-    var message: Float
-    var cnt: Int
-    var list: String
-    var email: String
-    var password: String
+struct GpullFormFilters: Content {
+    var ipAdd: String
+    var layerName: String?
 }
 
-struct User: Content {
-    var name: String
-    var email: String
+struct GappapiRequest: Content {
+    let OnlyNewest: Bool
+    let LayerName: String
+}
+
+struct GappapiResponse: Content {
+    struct ResultData: Codable {
+        let AreaName: String
+        let LayerName: String
+        let DeviceName: String
+        let LayerType: String
+        let DataType: String
+        let SenderId: String
+        let Data: Int
+        let Timestamp: String
+        let DataId: String
+        }
+    let Result: [ResultData]
+    let Message: String
 }
 
 struct ConsoleController: RouteCollection {
     func boot(router: Router) throws {
         let consoleRoutes = router.grouped("console")
         consoleRoutes.get("/", use: allConsoleHandler)
-        consoleRoutes.get("/mpush", use: microbotPushHandler)
-        consoleRoutes.post("login", use: loginHandler)
-        consoleRoutes.get("/user", use: userHandler)
+        consoleRoutes.get("/gpull", use: gappapiPullHandler)
     }
 
     func allConsoleHandler(_ req: Request) throws -> Future<View> {
@@ -52,31 +62,45 @@ struct ConsoleController: RouteCollection {
         }
     }
     
-    func microbotPushHandler(_ req: Request) throws -> Future<Response>{
+    func gappapiPullHandler(_ req: Request) throws -> Future<Response>{
+        let filters = try req.query.decode(GpullFormFilters.self)
+        let ipAdd = filters.ipAdd
+        let lyName = filters.layerName ?? ""
+        print("IP Address: ",ipAdd)
+        print("Layer Name: ",lyName)
+        let reqBody = GappapiRequest(OnlyNewest: true, LayerName: "\(lyName)")
+        // Mock API, still debugging certificate issue pulling from gravio
+        let futureRes = try req.client().post("http://www.mocky.io/v2/5ca1cd693700006900899415"){ newReq in
+            // encode the loginRequest before sending
+            try newReq.content.encode(reqBody)
+            }.flatMap { mockRes in
+                // Decode Content after Response is received
+                return try mockRes.content.decode(GappapiResponse.self)
+            }.map(to: Record.self) { apiRes in
+                // Map results to Record model
+                let areaName = apiRes.Result[0].AreaName // nested objects in an array
+                let layerName = apiRes.Result[0].LayerName
+                let value = apiRes.Result[0].Data
+                let type = apiRes.Result[0].DataType
+                let recordTime = apiRes.Result[0].Timestamp
+                let senderId = apiRes.Result[0].SenderId
+                print("areaName: ",areaName)
+                print("layerName: ",layerName)
+                print("value: ",value)
+                print("recordTime: ",recordTime)
+                return Record(
+                    value: "\(value)",
+                    areaName: "\(areaName)",
+                    layerName: "\(layerName)",
+                    type: "\(type)",
+                    recordTime: "\(recordTime)",
+                    senderId: "\(senderId)"
+                )
+            }.flatMap { record in
+                return record.save(on: req)
+            }
+        return futureRes .transform(to: req.redirect(to: "/console"))
+    }
 
-        let client = try req.make(Client.self)
-        let res = try client.post("https://o1.prota.space/mib/do/press?_id=dee6863098e2b3ca0eb6dedab207090d")
-        print(res)
-        return res .transform(to: req.redirect(to: "/console"))
-    }
-    
-    //test
-    func loginHandler (_ req: Request) throws -> Future<HTTPStatus> {
-        return try req.content.decode(LoginRequest.self).map(to: HTTPStatus.self) { loginRequest in
-            print(loginRequest.cod) //
-            print(loginRequest.message) //
-            //print(loginRequest.list) // nested objects??
-            print(loginRequest.email) //
-            print(loginRequest.password) //
-            return .ok
-        }
-    }
-    
-    func userHandler (_ req: Request) throws -> User{
-        return User(
-            name: "Vapor User",
-            email: "user@vapor.codes"
-        )
-    }
 }
 
