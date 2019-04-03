@@ -18,8 +18,17 @@ struct RecordsController: RouteCollection {
 
     func getAllHandler(_ req: Request) throws -> Future<[Record]> {
         var builder = Record.query(on: req)
+        if let area = req.query[String.self, at: "area"] {
+            builder = builder.filter(\.areaName == area)
+        }
+        if let layer = req.query[String.self, at: "layer"] {
+            builder = builder.filter(\.layerName == layer)
+        }
         if let type = req.query[String.self, at: "type"] {
-            builder = builder.filter(\.type == type)
+            let types = type.components(separatedBy: ",")
+            builder = builder.group(.or) { or in
+                types.forEach { or.filter(\.type == $0) }
+            }
         }
         if let from = req.query[String.self, at: "from"] {
             let formatter = DateFormatter()

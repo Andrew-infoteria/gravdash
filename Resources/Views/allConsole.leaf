@@ -1,5 +1,5 @@
 #set("content") {
-
+<div class="container">
 <p> Buttons and Controls here. </p>
 <br><br>
 
@@ -12,6 +12,6 @@ Microbot push button: <input type="submit" value="Push"/>
 <form action="/console" method="get">
 <p>Enter text to display on LED: <input type="ledInput" name="ledInput" placeholder=" Write something here." size="40"/> <input type="submit" value="Send"/>
 </form>
-
+</div>
 }
 #embed("base")

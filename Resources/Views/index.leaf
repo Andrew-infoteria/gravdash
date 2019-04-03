@@ -1,6 +1,10 @@
 #set("script") {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+<script src="http://bootstrap-notify.remabledesigns.com/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <script src="/scripts/utils.js"></script>
 <script src="/scripts/dashboard.js"></script>
 <script type="text/javascript">
@@ -10,148 +14,205 @@ var mappings = [];
 	mappings["#(mapping.senderId)"] = "#(mapping.tag)";
 }
 window.onload = function () {
-	prepareTemperatureChart();
-	prepareHumidityChart();
-	prepareDoorOpenChart();
-	prepareVibrationChart();
-	prepareButtonPressChart();
-	updatePanels();
-	$("#dashboard-range").change(function() {
-		updatePanels();
-	\});
-	setInterval(autoUpdatePanels, 30000);
+	setInterval(updateActiveSlide, 30000, false);
 \}
 </script>
 }
+#set("link") {
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+<style type="text/css">
+a.arrow:link, a.arrow:visited, a.arrow:active {
+	color: dimgrey;
+\}
+a.arrow:hover {
+	-webkit-transform: scale(1.3);
+	-moz-transform: scale(1.3);
+	-ms-transform: scale(1.3);
+\}
+.slick-slide {
+	margin: 0 20px;
+	outline: none;
+\}
+</style>
+}
 #set("content") {
-	<div class="" style="position: relative;">
-		<h1>Dashboard</h1>
-		<label>Range:</label>
-		<select id="dashboard-range">
-			<option value="1/days">Today</option>
-			<option value="2/days">Yesterday</option>
-			<option value="3/days">Three days</option>>
-			<option value="1/weeks">This week</option>
-			<option value="1/years">This month</option>
-		</select>
+<div class="container-fluid">
+	<div class="d-flex justify-content-between align-items-center">
+		<div class="d-inline-flex"><a class="arrow" href="#"><i class="fas fa-arrow-left fa-2x"></i></a></div>
+		<div class="pt-3 col-11" id="dashboard-slides">
+			#for(area in areas) {
+			<div class="dashboard-slide" data-area="#(area)">
+				<div class="d-flex justify-content-between">
+					<div class="d-inline-flex"><h1>#(area)</h1></div>
+					<div class="d-inline-flex align-self-center">
+						<select class="dashboard-range custom-select">
+							<option value="1/days">Today</option>
+							<option value="2/days">Yesterday</option>
+							<option value="3/days">Three days</option>>
+							<option value="1/weeks">This week</option>
+							<option value="1/years">This month</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col"><canvas id="temperature-chart" width="400" height="250"></canvas></div>
+					<div class="col"><canvas id="humidity-chart" width="400" height="250"></canvas></div>
+					<div class="col"><canvas id="door-open-chart" width="400" height="250"></canvas></div>
+				</div>
+				<div class="row border-top border-bottom">
+					<div class="col">
+						<div class="d-flex justify-content-around">
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-thermometer-quarter h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Min</u></div>
+									<div class="min-temp"><b>N/A</b></div>
+								</div>
+							</div>
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-thermometer-half h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Average</u></div>
+									<div class="avg-temp"><b>N/A</b></div>
+								</div>
+							</div>
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-thermometer-three-quarters h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Max</u></div>
+									<div class="max-temp"><b>N/A</b></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="d-flex justify-content-around">
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-tint h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Min</u></div>
+									<div class="min-humid"><b>N/A</b></div>
+								</div>
+							</div>
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-tint h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Average</u></div>
+									<div class="avg-humid"><b>N/A</b></div>
+								</div>
+							</div>
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-tint h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Max</u></div>
+									<div class="max-humid"><b>N/A</b></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="d-flex justify-content-around">
+							<div class="door-now">
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-door-open h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Now</u></div>
+									<div><b>N/A</b></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col"><canvas id="button-press-chart" width="400" height="250"></canvas></div>
+					<div class="col"><canvas id="vibration-chart" width="400" height="250"></canvas></div>
+					<div class="col"><canvas id="occupancy-chart" width="400" height="250"></canvas></div>
+				</div>
+				<div class="row border-top border-bottom">
+					<div class="col">
+					</div>
+					<div class="col">
+						<div class="d-flex justify-content-around">
+							<div class="vibartion-now">
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-check-circle h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Vibration Sensor</u></div>
+									<div><b>N/A</b></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="d-flex justify-content-around">
+							<div>
+								<div class="mx-2 d-inline-block align-middle"><i class="fas fa-clock h3 m-0"></i></div>
+								<div class="mr-2 d-inline-block align-middle text-center">
+									<div><u>Last Activity</u></div>
+									<div class="last-activity"><b>N/A</b></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			}
+		</div>
+		<div class="d-inline-flex"><a class="arrow" href="#"><i class="fas fa-arrow-right fa-2x"></i></a></div>
 	</div>
-	<br><br>
-	<table width="100%">
-		<tr>
-			<td>
-				<p><u>Main Door</u></p>
-				#if(count(doorStatePanel.doorStates) > 0){
-				#for(doorState in doorStatePanel.doorStates) {
-					#if(isLast){
-						#if(doorState.value > 0){
-							<h3><i class="fas fa-door-open"></i></h3>
-							<p> <b>Opened</b> </p>
-						} else {
-							<h3><i class="fas fa-door-closed"></i></h3>
-							<p> <b>Closed</b> </p>
-						}
-					}
-				}
-				} else {
-					<p> No Door state data!</p>
-				}
-			</td>
-			<td>
-				<p><u>People in Office</u></p>
-				<h3>
-					<i class="fas fa-users"></i>
-				</h3>
-				#if(count(officePeoplePanel.officePeople) > 0){
-				#for(pax in officePeoplePanel.officePeople){
-					#if(isLast){
-						<p> <b>#(pax.value) Pax</b> </p>
-					}
-				}
-				} else {
-				<p> No Number of People data!</p>
-				}
-				
-			</td>
-			<td>
-				<p><u>Vibration Sensor</u></p>
-				#if(count(vibrationPanel.vibrations) > 0){
-				#for(vibration in vibrationPanel.vibrations){
-					#if(isLast){
-						#if(vibration.value == 0){
-							<h3><i class="fas fa-check-circle"></i></h3>
-							<p> <b>Stable</b> </p>
-						} else {
-							#if(vibration.value == 1){
-							<h3><i class="fas fa-exclamation-circle"></i></h3>
-							<p> <b>Slight Movement</b> </p>
-							} else {
-								#if(vibration.value == 3){
-								<h3><i class="fas fa-minus-circle"></i></h3>
-								<p> <b>Falling!</b> </p>
-								} else {
-								<h3><i class="fas fa-adjust"></i></h3>
-								<p> <b>Tilted #(vibration.value)º</b> </p>
-								} else {
-								}
-							}
-						}
-					}
-				}
-				} else {
-					<p> No Vibration data!</p>
-				}
-			</td>
-			<td background="/images/calendar.png" no-repeat style="background-size:contain; background-repeat:no-repeat; text-align:left; padding-left:30px;" colspan="2">
-				<p>#(todayDate.today)</p>
-			</td>
-		</tr>
-		#if(count(temperaturePanel.temperatures) > 0) {
-		<tr>
-			<td rowspan="3" colspan="3" width="88%">
-				<br><br>
-				<canvas id="temperature-chart" width="400" height="200" data-url="/api/records?type=Temperature"></canvas>
-			</td>
-			<td>
-				<h3><i class="fas fa-thermometer-three-quarters"></i></h3>
-			</td>
-			<td>
-				<div><u>Max Today</u></div>
-				<p><b id="max-temp"></b></p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h3><i class="fas fa-thermometer-half"></i></h3>
-			</td>
-			<td styletext-align="left">
-				<div><u>Average Today</u></div>
-				<p><b id="avg-temp"></b></p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<h3><i class="fas fa-thermometer-quarter"></i></h3>
-			</td>
-			<td>
-				<div><u>Min Today</u></div>
-				<p><b id="min-temp"></b></p>
-			</td>
-		</tr>
-		}
-	</table>
-	#if(count(humidityPanel.humidities) > 0){
-	<br><br>
-	<canvas id="humidity-chart" width="400" height="200"></canvas>
-	}
-	#if(count(doorStatePanel.doorStates) > 0){
-	<br><br>
-	<canvas id="door-open-chart" width="400" height="200"></canvas>
-	}
-	<br><br>
-	<canvas id="button-press-chart" width="400" height="200"></canvas>
-	#if(count(vibrationPanel.vibrations) > 0){
-	<br><br>
-	<canvas id="vibration-chart" width="400" height="200"></canvas>
-	}
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#dashboard-slides').slick({
+			arrows: false,
+			dots: true,
+			infinite: false
+		\});
+		$('.slick-slide').not('.slick-cloned').each(function() {
+			var slide = $(this);
+			var area = slide.data('area');
+			window.charts[area] = {\};
+			prepareCharts(slide);
+		\});
+		updateSlideControls();
+		updateActiveSlide();
+		$(".dashboard-range").change(function() {
+			var slide = $(this).parents('.dashboard-slide');
+			updateTemperaturePanel(slide);
+			updateHumidityPanel(slide);
+			updateDoorPanel(slide);
+			updateButtonPressPanel(slide);
+			updateVibrationPanel(slide);
+			updateOccupancyPanel(slide);
+		\});
+	\});
+	$(".fa-arrow-left").click(function() {
+		if (!isFirstSlide()) {
+			$('#dashboard-slides').slick('slickPrev');
+		\}
+	\});
+	$(".fa-arrow-right").click(function() {
+		if (!isLastSlide() && getSlideCount() > 1) {
+			$('#dashboard-slides').slick('slickNext');
+		\}
+	\});
+	$("#dashboard-slides").on('afterChange', function(event, slick, currentSlide) {
+		updateActiveSlide();
+		updateSlideControls();
+	\})
+	function getSlideCount() {
+		return $('#dashboard-slides').slick('getSlick').slideCount;
+	\}
+	function isFirstSlide() {
+		var slider = $('#dashboard-slides');
+		var index = slider.slick('slickCurrentSlide');
+		return index == 0;
+	\}
+	function isLastSlide() {
+		var slider = $('#dashboard-slides');
+		var index = slider.slick('slickCurrentSlide');
+		var count = getSlideCount();
+		return index == count - 1;
+	\}
+</script>
 }
 #embed("base")

@@ -45,6 +45,7 @@ jQuery(document).ready(function($) {
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 }
 #set("content") {
+<div class="container-fluid">
 	<h1>All Records</h1>
 	#if(count(records) > 0) {
 	<table id="records" class="table table-bordered table-hover" width="100%">
@@ -65,5 +66,6 @@ jQuery(document).ready(function($) {
 	} else {
 		<h2>There aren't any records yet!</h2>
 	}
+</div>
 }
 #embed("base")

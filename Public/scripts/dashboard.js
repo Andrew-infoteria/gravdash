@@ -1,24 +1,34 @@
-function updatePanels() {
-	updateTemperaturePanel();
-	updateHumidityPanel();
-	updateDoorPanel();
-	updateButtonPressPanel();
-	updateVibrationPanel();
+function prepareCharts(slide) {
+	prepareTemperatureChart(slide);
+	prepareHumidityChart(slide);
+	prepareDoorOpenChart(slide);
+	prepareButtonPressChart(slide);
+	prepareVibrationChart(slide);
+	prepareOccupancyChart(slide);
 }
 
-function autoUpdatePanels() {
-	updateTemperaturePanel(false);
-	updateHumidityPanel(false);
-	updateDoorPanel(false);
-	updateButtonPressPanel(false);
-	updateVibrationPanel(false);
+function updateActiveSlide(animate = true) {
+	var slide = $(".slick-current");
+	if (!slide) return;
+	updateTemperaturePanel(slide, animate);
+	updateHumidityPanel(slide, animate);
+	updateDoorPanel(slide, animate);
+	updateButtonPressPanel(slide, animate);
+	updateVibrationPanel(slide, animate);
+	updateOccupancyPanel(slide, animate);
+}
+
+function updateSlideControls() {
+	$(".fa-arrow-left").parent().css("color", isFirstSlide() ? "lightgrey" : "dimgrey");
+	$(".fa-arrow-right").parent().css("color", isLastSlide() ? "lightgrey" : "dimgrey");
 }
 
 // Temperature
-function prepareTemperatureChart() {
-	var ctx = document.getElementById("temperature-chart");
+function prepareTemperatureChart(slide) {
+	var ctx = slide.find("#temperature-chart")[0];
 	if (!ctx) return;
-	window.charts.temperature = new Chart(ctx, {
+	var area = slide.data("area");
+	window.charts[area].temperature = new Chart(ctx, {
 		type: 'line',
 		data: {
 			datasets: []
@@ -67,13 +77,14 @@ function prepareTemperatureChart() {
 	});
 }
 
-function updateTemperaturePanel(animate = true) {
-	var chart = window.charts.temperature;
+function updateTemperaturePanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].temperature;
 	if (!chart) return;
-	var element = document.getElementById("dashboard-range");
+	var element = slide.find(".dashboard-range")[0];
 	var range = element.options[element.selectedIndex].value.split('/');
 	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Temperature&from=' + from, function(records) {
+	getChartData('/api/records?area=' + area + '&type=Temperature&from=' + from, function(records) {
 		var tDatasets = {};
 		for (var i = 0; i < records.length; i++) {
 			var senderId = records[i].senderId;
@@ -96,23 +107,24 @@ function updateTemperaturePanel(animate = true) {
 		chart.data.datasets = chartDatasets;
 		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
-		var temperatures = records.reduce(function (a, r) { a.push(parseFloat(r.value)); return a; }, []);
-		var max = Math.max(...temperatures);
-		var min = Math.min(...temperatures);
-		document.getElementById("max-temp").innerText = max.toFixed(2) + 'ºC';
-		document.getElementById("min-temp").innerText = min.toFixed(2) + 'ºC';
-		if (temperatures.length > 0) {
+		if (records.length > 0) {
+			var temperatures = records.reduce(function (a, r) { a.push(parseFloat(r.value)); return a; }, []);
+			var min = Math.min(...temperatures);
+			var max = Math.max(...temperatures);
 			var avg = temperatures.reduce(function(a, b) { return a + b; }) / temperatures.length;
-			document.getElementById("avg-temp").innerText = avg.toFixed(2) + 'ºC';
 		}
+		slide.find(".max-temp b").html(max ? max.toFixed(2) + "ºC" : "N/A");
+		slide.find(".min-temp b").html(min ? min.toFixed(2) + "ºC" : "N/A");
+		slide.find(".avg-temp b").html(avg ? avg.toFixed(2) + "ºC" : "N/A");
 	});
 }
 
 // Humidity
-function prepareHumidityChart() {
-	var ctx = document.getElementById("humidity-chart");
+function prepareHumidityChart(slide) {
+	var ctx = slide.find("#humidity-chart")[0];
 	if (!ctx) return;
-	window.charts.humidity = new Chart(ctx, {
+	var area = slide.data("area");
+	window.charts[area].humidity = new Chart(ctx, {
 		type: 'line',
 		data: {
 			datasets: []
@@ -162,13 +174,14 @@ function prepareHumidityChart() {
 	});
 }
 
-function updateHumidityPanel(animate = true) {
-	var chart = window.charts.humidity;
+function updateHumidityPanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].humidity;
 	if (!chart) return;
-	var element = document.getElementById("dashboard-range");
+	var element = slide.find(".dashboard-range")[0];
 	var range = element.options[element.selectedIndex].value.split('/');
 	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Humidity&from=' + from, function(records) {
+	getChartData('/api/records?area=' + area + '&type=Humidity&from=' + from, function(records) {
 		var hDatasets = {};
 		for (var i = 0; i < records.length; i++) {
 			var senderId = records[i].senderId;
@@ -191,14 +204,24 @@ function updateHumidityPanel(animate = true) {
 		chart.data.datasets = chartDatasets;
 		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
+		if (records.length > 0) {
+			var humidities = records.reduce(function (a, r) { a.push(parseFloat(r.value)); return a; }, []);
+			var min = Math.min(...humidities);
+			var max = Math.max(...humidities);
+			var avg = humidities.reduce(function(a, b) { return a + b; }) / humidities.length;
+		}
+		slide.find(".min-humid b").html(min ? min.toFixed(2) + "%" : "N/A");
+		slide.find(".max-humid b").html(max ? max.toFixed(2) + "%" : "N/A");
+		slide.find(".avg-humid b").html(avg ? avg.toFixed(2) + "%" : "N/A");
 	});
 }
 
 // Door
-function prepareDoorOpenChart() {
-	var ctx = document.getElementById("door-open-chart");
+function prepareDoorOpenChart(slide) {
+	var ctx = slide.find("#door-open-chart")[0];
 	if (!ctx) return;
-	window.charts.doorOpen = new Chart(ctx, {
+	var area = slide.data("area");
+	window.charts[area].doorOpen = new Chart(ctx, {
 		type: 'bar',
 		data: {
 			labels: [],
@@ -236,13 +259,14 @@ function prepareDoorOpenChart() {
 	});
 }
 
-function updateDoorPanel(animate = true) {
-	var chart = window.charts.doorOpen;
+function updateDoorPanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].doorOpen;
 	if (!chart) return;
-	var element = document.getElementById("dashboard-range");
+	var element = slide.find(".dashboard-range")[0];
 	var range = element.options[element.selectedIndex].value.split('/');
 	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Door+state&from=' + from, function(records) {
+	getChartData('/api/records?area=' + area + '&type=Door+state&from=' + from, function(records) {
 		var sort = [];
 		for (var i = 0; i < records.length; i++) {
 			if (records[i].value == 1) {
@@ -265,23 +289,41 @@ function updateDoorPanel(animate = true) {
 			}
 			chartDatasets.push(chartDataset)
 		}
-		var firstDate = new Date(records.reduce((min, r) => r.recordTime < min ? r.recordTime : min, records[0].recordTime));
-		var lastDate = new Date(records.reduce((max, r) => r.recordTime > max ? r.recordTime : max, records[0].recordTime));
-		firstDate.setDate(firstDate.getDate() - 1);
-		lastDate.setDate(lastDate.getDate() + 1);
-		var bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+		var bound = [];
+		if (records.length > 0) {
+			var firstDate = new Date(records.reduce((min, r) => r.recordTime < min ? r.recordTime : min, records[0].recordTime));
+			var lastDate = new Date(records.reduce((max, r) => r.recordTime > max ? r.recordTime : max, records[0].recordTime));
+			firstDate.setDate(firstDate.getDate() - 1);
+			lastDate.setDate(lastDate.getDate() + 1);
+			bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+		}
 		chart.data.labels = bound;
 		chart.data.datasets = chartDatasets;
 		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
+		var latest = records[records.length - 1];
+		var nowIcon = slide.find(".door-now i.fas");
+		var nowText = slide.find(".door-now div b");
+		nowIcon.removeClass('fa-door-open fa-door-closed');
+		if (!latest) {
+			nowText.html('N/A');
+			nowIcon.addClass('fa-door-open');
+		} else if (latest.value == 1) {
+			nowText.html('Open');
+			nowIcon.addClass('fa-door-open');
+		} else {
+			nowText.html('Closed');
+			nowIcon.addClass('fa-door-closed');
+		}
 	});
 }
 
 // Button Press
-function prepareButtonPressChart() {
-	var ctx = document.getElementById("button-press-chart");
+function prepareButtonPressChart(slide) {
+	var ctx = slide.find("#button-press-chart")[0];
 	if (!ctx) return;
-	window.charts.buttonPress = new Chart(ctx, {
+	var area = slide.data("area");
+	window.charts[area].buttonPress = new Chart(ctx, {
 		type: 'bar',
 		data: {
 			labels: [],
@@ -319,13 +361,14 @@ function prepareButtonPressChart() {
 	});
 }
 
-function updateButtonPressPanel(animate = true) {
-	var chart = window.charts.buttonPress;
+function updateButtonPressPanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].buttonPress;
 	if (!chart) return;
-	var element = document.getElementById("dashboard-range");
+	var element = slide.find(".dashboard-range")[0];
 	var range = element.options[element.selectedIndex].value.split('/');
 	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Button+press&from=' + from, function(records) {
+	getChartData('/api/records?area=' + area + '&type=Button+press&from=' + from, function(records) {
 		var sort = [];
 		for (var i = 0; i < records.length; i++) {
 			var date = records[i].recordTime.split('T')[0];
@@ -348,11 +391,14 @@ function updateButtonPressPanel(animate = true) {
 			}
 			chartDatasets.push(chartDataset)
 		}
-		var firstDate = new Date(records.reduce((min, r) => r.recordTime < min ? r.recordTime : min, records[0].recordTime));
-		var lastDate = new Date(records.reduce((max, r) => r.recordTime > max ? r.recordTime : max, records[0].recordTime));
-		firstDate.setDate(firstDate.getDate() - 1);
-		lastDate.setDate(lastDate.getDate() + 1);
-		var bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+		var bound = [];
+		if (records.length > 0) {
+			var firstDate = new Date(records.reduce((min, r) => r.recordTime < min ? r.recordTime : min, records[0].recordTime));
+			var lastDate = new Date(records.reduce((max, r) => r.recordTime > max ? r.recordTime : max, records[0].recordTime));
+			firstDate.setDate(firstDate.getDate() - 1);
+			lastDate.setDate(lastDate.getDate() + 1);
+			bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+		}
 		chart.data.labels = bound;
 		chart.data.datasets = chartDatasets;
 		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
@@ -361,10 +407,11 @@ function updateButtonPressPanel(animate = true) {
 }
 
 // Vibration
-function prepareVibrationChart() {
-	var ctx = document.getElementById("vibration-chart");
+function prepareVibrationChart(slide) {
+	var ctx = slide.find("#vibration-chart")[0];
 	if (!ctx) return;
-	window.charts.vibration = new Chart(ctx, {
+	var area = slide.data("area");
+	window.charts[area].vibration = new Chart(ctx, {
 		type: 'scatter',
 		data: {
 			datasets: []
@@ -412,19 +459,22 @@ function prepareVibrationChart() {
 	});
 }
 
-function updateVibrationPanel(animate = true) {
-	var chart = window.charts.vibration;
+function updateVibrationPanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].vibration;
 	if (!chart) return;
-	var element = document.getElementById("dashboard-range");
+	var element = slide.find(".dashboard-range")[0];
 	var range = element.options[element.selectedIndex].value.split('/');
 	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
-	getChartData('/api/records?type=Tilt&from=' + from, function(records) {
+	getChartData('/api/records?area=' + area + '&type=Ready,Slight+movement,Drop,Tilt&from=' + from, function(records) {
 		var vDatasets = {};
 		for (var i = 0; i < records.length; i++) {
-			var senderId = records[i].senderId;
-			var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
-			var data = {x: new Date(records[i].recordTime), y: records[i].value};
-			addDataToDataset(data, vDatasets, label);
+			if (records[i].type == "Tilt") {
+				var senderId = records[i].senderId;
+				var label = typeof mappings[senderId] === 'undefined' ? senderId : mappings[senderId];
+				var data = {x: new Date(records[i].recordTime), y: records[i].value};
+				addDataToDataset(data, vDatasets, label);
+			}
 		}
 		var colors = [window.chartColors.red, window.chartColors.blue, window.chartColors.green, window.chartColors.yellow, window.chartColors.grey];
 		var chartDatasets = [];
@@ -440,6 +490,115 @@ function updateVibrationPanel(animate = true) {
 		chart.data.datasets = chartDatasets;
 		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
 		chart.update();
+		var latest = records[records.length - 1];
+		var nowIcon = slide.find(".vibartion-now i.fas");
+		var nowText = slide.find(".vibartion-now div b");
+		nowIcon.removeClass("fa-check-circle fa-exclamation-circle fa-minus-circle fa-adjust");
+		if (!latest) {
+			nowIcon.addClass("fa-check-circle");
+			nowText.html("N/A");
+		} else if (latest.type.toLowerCase() == "ready") {
+			nowIcon.addClass("fa-check-circle");
+			nowText.html("Stable");
+		} else if (latest.type.toLowerCase() == "slight movement") {
+			nowIcon.addClass("fa-exclamation-circle");
+			nowText.html("Slight Movement");
+		} else if (latest.type.toLowerCase() == "drop") {
+			nowIcon.addClass("fa-minus-circle");
+			nowText.html("Falling");
+		} else {
+			nowIcon.addClass("fa-adjust");
+			nowText.html("Tilted " + latest.value + "º");
+		}
+	});
+}
+
+// Vibration
+function prepareOccupancyChart(slide) {
+	var ctx = slide.find("#occupancy-chart")[0];
+	if (!ctx) return;
+	var area = slide.data("area");
+	window.charts[area].occupancy = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: [],
+			datasets: []
+		},
+		options: {
+			title: {
+				display: true,
+				fontSize: 20,
+				text: 'Motion'
+			},
+			legend: {
+				position: 'bottom'
+			},
+			scales: {
+				xAxes: [{
+					type: 'time',
+					display: true,
+					time: {
+						unit: 'day'
+					}
+				}],
+				yAxes: [{
+					ticks: {
+						min: 0
+					},
+					scaleLabel: {
+						display: true,
+						labelString: 'Number of times',
+						fontSize: 20
+					}
+				}]
+			}
+		}
+	});
+}
+
+function updateOccupancyPanel(slide, animate = true) {
+	var area = slide.data("area");
+	var chart = window.charts[area].occupancy;
+	if (!chart) return;
+	var element = slide.find(".dashboard-range")[0];
+	var range = element.options[element.selectedIndex].value.split('/');
+	var from = moment().subtract(range[0], range[1]).utc().format('YYYY-MM-DDTHH:mm:ss');
+	getChartData('/api/records?area=' + area + '&type=Motion+Detected&from=' + from, function(records) {
+		var sort = [];
+		for (var i = 0; i < records.length; i++) {
+			var date = records[i].recordTime.split('T')[0];
+			addDataToDataset(records[i], sort, date);
+		}
+		var oDatasets = {"Motion Detected": []};
+		for (var date in sort) {
+			oDatasets["Motion Detected"].push({x: date, y: sort[date].length});
+		}
+		var colors = [window.chartColors.grey];
+		var chartDatasets = [];
+		for (var key in oDatasets) {
+			var chartDataset = {
+				label: key,
+				backgroundColor: colors.shift(),
+				fill: false,
+				data: oDatasets[key]
+			}
+			chartDatasets.push(chartDataset)
+		}
+		var bound = [];
+		if (records.length > 0) {
+			var firstDate = new Date(records.reduce((min, r) => r.recordTime < min ? r.recordTime : min, records[0].recordTime));
+			var lastDate = new Date(records.reduce((max, r) => r.recordTime > max ? r.recordTime : max, records[0].recordTime));
+			firstDate.setDate(firstDate.getDate() - 1);
+			lastDate.setDate(lastDate.getDate() + 1);
+			bound = [firstDate.toISOString().split('T')[0], lastDate.toISOString().split('T')[0]];
+		}
+		chart.data.labels = bound;
+		chart.data.datasets = chartDatasets;
+		chart.options.animation.duration = animate ? Chart.defaults.global.animation.duration : 0;
+		chart.update();
+		var latest = records[records.length - 1];
+		var strLastAct = latest ? moment(latest.recordTime).fromNow() : "N/A";
+		slide.find(".last-activity b").html(strLastAct);
 	});
 }
 

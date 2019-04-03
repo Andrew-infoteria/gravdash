@@ -23,6 +23,7 @@ struct WebsiteController: RouteCollection {
         let occupancyFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "Motion Detected").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let officePeopleFuture: Future<[Record]> = Record.query(on: req).filter(\.type == "NumberOfPeople").filter(\.recordTime >= yesterday).sort(\.recordTime, .ascending).all()
         let vibrationFuture: Future<[Record]> = Record.query(on: req).group(.or) { $0.filter(\.type == "Ready").filter(\.type == "Tilt").filter(\.type == "Drop") }.filter(\.recordTime >= threedays).sort(\.recordTime, .ascending).all()
+        let areaNameFuture = req.withPooledConnection(to: .psql) { (conn) -> Future<[Record]> in conn.raw("SELECT DISTINCT ON (\"areaName\") * FROM \"Record\"").all(decoding: Record.self)}
         let mappingFuture: Future<[Mapping]> = Mapping.query(on: req).all();
 
         return map(to: DashboardContext.self, temperatureFuture, humidityFuture, buttonPressFuture, doorStateFuture, occupancyFuture) { temperatures, humidities, buttonPresses, doorStates, occupancies in
@@ -46,12 +47,13 @@ struct WebsiteController: RouteCollection {
             return context
         }.flatMap(to: DashboardContext.self) { dashboard in
             var context = dashboard
-            return map(officePeopleFuture, vibrationFuture, mappingFuture) {officePeople, vibrations, mappings in
+            return map(officePeopleFuture, vibrationFuture, areaNameFuture, mappingFuture) {officePeople, vibrations, areaNames, mappings in
                 let offPplCtx = OfficePeoplePanelContext(officePeople: officePeople)
                 let vibrateCtx = VibrationPanelContext(vibrations: vibrations)
                 context.officePeoplePanel = offPplCtx
                 context.vibrationPanel = vibrateCtx
                 context.mappings = mappings
+                context.areas = areaNames.map { $0.areaName }
                 
                 let displayFormatter = DateFormatter()
                 displayFormatter.dateFormat = "dd MMM"
@@ -95,6 +97,7 @@ struct DashboardContext: Encodable {
     var officePeoplePanel: OfficePeoplePanelContext? = nil
     var vibrationPanel: VibrationPanelContext? = nil
     var mappings: [Mapping]? = nil
+    var areas: [String]? = nil
 
     init(title: String) {
         self.title = title
