@@ -182,8 +182,8 @@ struct SettingsController: RouteCollection {
                         recordTime: "\(recordTime)",
                         senderId: "\(senderId)"
                     )
-                    //let singleRecord.id = "12345"
-                    try singleRecord.save(on: req)
+                    _=singleRecord.save(on: req)
+                    
                 } else {
                     print("value: ",value)
                     let singleRecord = Record(
@@ -194,7 +194,8 @@ struct SettingsController: RouteCollection {
                         recordTime: "\(recordTime)",
                         senderId: "\(senderId)"
                     )
-                    try singleRecord.save(on: req)
+                    _=singleRecord.save(on: req)
+                    
                 }
                 print("recordTime: ",recordTime)
                 print("dataId: ",dataId)
