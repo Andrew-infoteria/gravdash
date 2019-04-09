@@ -1,9 +1,17 @@
 #set("content") {
 
-<p> More settings here. </p>
-<br><br>
+<table width="100%">
+<tr>
+    <td class="settings">
+        #get(settings-content)
+    </td>
+    <td width="10%" class="settings">
+        <u>Sliding Menu</u><br><br>
+        <a href="/settings">Mapping</a><br>
+        <a href="/settings/gpull" >Gravio Puller</a>
+    </td>
+</tr>
 
-#get(mapping-content)
-
+</table>
 }
 #embed("base")

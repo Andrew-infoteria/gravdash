@@ -8,3 +8,23 @@ h3 {
     font-size: 40px;
     text-align: center;
 }
+td.settings {
+    vertical-align: top;
+    text-align: left;
+}
+a.settings {
+    text-align: left;
+}
+.layerNameField {
+    float: left;
+    display: inline;
+}
+span {
+    display: block;
+    overflow: hidden;
+    padding: 0 4px 0 6px
+}
+.manualPullForm {
+    padding: 2px;
+    text-align: left;
+}

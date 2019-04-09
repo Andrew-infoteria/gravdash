@@ -1,4 +1,4 @@
-#set("mapping-content") {
+#set("settings-content") {
 
 <h1>Add New Mapping</h1>
 <form action="/settings/createMap" method="POST">

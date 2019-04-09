@@ -1,0 +1,96 @@
+#set("settings-content") {
+
+<h1>Gravio Puller Settings</h1>
+
+<h2>Manual Pull</h2>
+<div style="height:10em">
+<form action="/settings/manualgpull" method="get">
+<u>Gravio App API puller</u> <br>
+<div style="float:left;">
+<table border="0" class="manualPullForm">
+    <tr>
+        <td class="manualPullForm">IP Address: </td>
+        <td class="manualPullForm"><input type="text" name="leafIpAddress" placeholder=" e.g. 192.168.49.16" size="30"/> <font color=red> *Required Field</font></td>
+    </tr><tr>
+        <td class="manualPullForm">Area Name: </td>
+        <td class="manualPullForm"><input type="text" name="leafAreaName" placeholder=" e.g. Meeting Room" size="30"/></td>
+        <td class="manualPullForm">Layer Name: </td>
+        <td class="manualPullForm"><input type="text" name="leafLayerName" placeholder=" e.g. Wireless Switch" size="33"/></td>
+    </tr><tr>
+        <td class="manualPullForm">Data Type: </td>
+        <td class="manualPullForm"><input type="text" name="leafDataType" placeholder=" e.g. Door state" size="30"/></td>
+        <td class="manualPullForm">Sender Id: </td>
+        <td class="manualPullForm"><input type="text" name="leafSenderId" placeholder=" e.g. 83-53-43-02-00-8D-15-00" size="33"/></td>
+    </tr><tr>
+        <td class="manualPullForm">Date From: </td>
+        <td class="manualPullForm"><input type="datetime-local" name="leafDateFrom" size="31"></td>
+        <td class="manualPullForm">Date To: </td>
+        <td class="manualPullForm"><input type="datetime-local" name="leafDateTo" value="#(todayDate.today)"></td>
+    </tr>
+</table>
+</div>
+<div style="float:left; padding-left:30px;"><input style="width: 103px;  height: 103px;"input type="submit" value="Pull"/></div>
+</form>
+</div>
+<br><br>
+<h2>Auto Pull</h2>
+<form action="/settings/createGpull" id="form" method="post">
+<u>Gravio App API puller</u> <br>
+<table>
+    <tr>
+<td colspan=2 class="settings">IP Address: <input type="text" name="ipAddress" placeholder=" e.g. 192.168.49.16" size="19"/> <font color=red> *Required Field</font></td>
+<td colspan=2 class="settings">Area Name: <input name="areaNames" placeholder=" e.g. Meeting Room" size="31"/></td>
+    </tr>
+<!--    <tr>
+    <td>Layer Name 1: <input type="text" name="layerNames[]" placeholder=" e.g. Wireless Switch"></td>
+    <td>Layer Name 2: <input type="text" name="layerNames[]" placeholder=" e.g. Temperature"></td>
+    <td>Layer Name 3: <input type="text" name="layerNames[]"></td>
+    <td>Layer Name 4: <input type="text" name="layerNames[]"></td>
+    </tr>
+    <tr id="myrow">
+    </tr>
+<br>
+<input type="button" value="More Layers" onclick="insert();"><br>-->
+</table>
+<input type="hidden" name="active" value=1>
+<input type="hidden" name="interval" value=60>
+<input type="submit" name="send" id="send" value="Add To Auto Puller"/>
+</form>
+<br><br>
+<table class="table table-bordered table-hover">
+<thead class="thead-light">
+<tr>
+    <th> IP Address </th>
+    <th> Area Names </th>
+    <th hidden> Layer Names </th>
+    <th> Status </th>
+    <th> Interval </th>
+    <th> Actions </th>
+</tr>
+</thead>
+#for(gpull in gpulls) {
+<tr>
+    <td>#(gpull.ipAddress)</td>
+    <td>#(gpull.areaNames)</td>
+    <td hidden>#for(layerName in gpull.layerNames){#(layerName)#if(isLast){.}else{, } }</td>
+    <td>#if(gpull.active == true) {
+            Active
+        } else {
+            Inactive
+        }
+    </td>
+    <td>#(gpull.interval) seconds</td>
+    <td>
+        <form action="/settings/deleteGpull" method="POST">
+            <input type="hidden" name="gpullId" value="#(gpull.id)"/>
+        <input type="submit" value="Delete" /></td>
+    </form>
+    </td>
+</tr>
+}
+</table>
+
+<script src="/scripts/settings.js"></script>
+
+}
+#embed("allSettings")

@@ -3,11 +3,12 @@
 <p> Buttons and Controls here. </p>
 <br><br>
 
-<form action="/console/gpull" method="get">
-<u>Gravio App API puller</u> <br>
-IP Address: <input type="ipAdd" name="ipAdd" placeholder=" e.g. 192.168.49.16" size="40"/> <br>
-Layer Name: <input type="layerName" name="layerName" placeholder=" e.g. Wireless Switch" size="40"/> <br>
-<input type="submit" value="Pull"/>
+
+<u>Gravio Action List</u> <br>
+<form action="/console" method="get">
+<input type="hidden" name="port" value="29443"/>
+<input type="hidden" name="url" value="/runaction"/>
+Action Name: <input type="submit" value="GappInfo-1-1"/> <input type="submit" value="Turn Light Off"/> <input type="submit" value="Action 3"/> <input type="submit" value="Action 4"/>
 </form>
 
 

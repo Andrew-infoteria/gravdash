@@ -51,6 +51,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     var migrations = MigrationConfig()
     migrations.add(model: Record.self, database: .psql)
     migrations.add(model: Mapping.self, database: .psql)
+    migrations.add(model: GravioPuller.self, database: .psql)
     services.register(migrations)
 
     var commandConfig = CommandConfig.default()
