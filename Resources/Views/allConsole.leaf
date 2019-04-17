@@ -3,15 +3,7 @@
 <p> Buttons and Controls here. </p>
 <br><br>
 
-<form action="/console/mpush" method="get">
-Microbot push button: <input type="submit" value="Push"/>
-</form>
 
-<br><br>
-
-<form action="/console" method="get">
-<p>Enter text to display on LED: <input type="ledInput" name="ledInput" placeholder=" Write something here." size="40"/> <input type="submit" value="Send"/>
-</form>
 
 }
 #embed("base")

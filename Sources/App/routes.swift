@@ -10,4 +10,6 @@ public func routes(_ router: Router) throws {
     try router.register(collection: settingsController)
     let consoleController = ConsoleController()
     try router.register(collection: consoleController)
+    let vLedController = VirtualLedController()
+    try router.register(collection: vLedController)
 }
