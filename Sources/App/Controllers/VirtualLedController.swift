@@ -75,7 +75,7 @@ struct VirtualLedController: RouteCollection {
         }
         if let from = req.query[String.self, at: "from"] {
             let formatter = DateFormatter()
-            formatter.dateFormat = "dd/MM/yyyy' 'H:mm:ss' 'a"
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
             guard let _ = formatter.date(from: from) else {
                 print("Incorrect date format: from: " + from)
                 throw Abort(.badRequest)
